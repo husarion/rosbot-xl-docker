@@ -8,8 +8,6 @@ ENV ROSBOT_XL_ROS_BUILD simulation
 
 WORKDIR /ros2_ws
 
-COPY . .
-
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 # install everything needed
@@ -21,6 +19,7 @@ RUN apt-get update --fix-missing && apt-get install -y \
     apt-get upgrade -y && \
     # build & install ROSbot XL packages
     source "/opt/ros/$ROS_DISTRO/setup.bash" && \
+    git clone https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src && \
     vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/rosbot_xl/rosbot_xl_simulation.repos && \
     rosdep update --rosdistro $ROS_DISTRO && \
