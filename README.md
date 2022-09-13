@@ -2,6 +2,13 @@
 
 Docker images for ROSbot XL
 
+[![Build a Docker Image](https://github.com/husarion/rosbot-xl-docker/actions/workflows/build_push.yaml/badge.svg)](https://github.com/husarion/rosbot-xl-docker/actions/workflows/build_push.yaml)
+
+Official ROSbot XL docker images built from this repo are available here: https://hub.docker.com/r/husarion/rosbot-xl/tags
+
+- `husarion/rosbot-xl:galactic` - the image for a real (physical) robot
+- `husarion/rosbot-xl:galactic-simulation` - the image with built-in Gazebo simulation model
+
 <!-- Docker Image for ROS Melodic Node providing interface for STM32 firmware over ROS-serial.
 
 `rosbot-xl-docker` contain following ROS packages:
@@ -13,23 +20,20 @@ With _docker-compose_ configuration shown in [demo](./demo) it can communicate w
 
 ## Flashing the firmware
 
-<!-- Firmware if flashed from inside of the container. In order to use specific kinematics flash matching firmware.
+Connect your laptop to Micro USB port on the ROSbot XL digital board (with STM32F4), check USB port in your OS with a serial connection to the board (in most cases `/dev/ttyUSB0`).
 
-### Differential kinematics (normal wheels)
+Set dip switch no. 3 on ROSbot XL digital board to **"on" state** (`BOOT0` pin to HIGH) and click the `RESET` button, to enter the programming mode.
+
+Execute in a termianl on your laptop:
 
 ```bash
-docker run --rm -it --privileged \
-husarion/rosbot:noetic \
-/flash-firmware.py /root/firmware_diff.bin
+docker run --rm -it \
+--device /dev/ttyUSB0:/dev/ttyUSB0 \
+husarion/rosbot-xl:galactic \
+/stm32flash -w /firmware.bin -b 115200 -v /dev/ttyUSB0
 ```
 
-### Mecanum kinematics
-
-```bash
-docker run --rm -it --privileged \
-husarion/rosbot:noetic \
-/flash-firmware.py /root/firmware_mecanum.bin
-``` -->
+Set dip switch no. 3 to **"off" state**  (`BOOT0` pin to LOW) and click the `RESET` button to start a newly flashed firmware.
 
 ## Building locally
 
