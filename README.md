@@ -37,12 +37,13 @@ Set dip switch no. 3 to **"off" state**  (`BOOT0` pin to LOW) and click the `RES
 
 ## Building locally
 
-<!-- ```bash
+```bash
 docker buildx build \
+-f Dockerfile.hardware \
 --platform linux/amd64 \
--t rosbot-docker-test \
+-t rosbot-xl-docker-test \
 .
-``` -->
+```
 
 <!-- ## ROS node
 
