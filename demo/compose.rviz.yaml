@@ -4,7 +4,7 @@
 
 services:
   rviz:
-    image: husarion/rviz2:humble
+    image: husarion/rviz2:galactic
     container_name: rviz
     restart: on-failure
     volumes:
