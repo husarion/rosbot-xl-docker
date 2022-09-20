@@ -21,7 +21,7 @@ services:
     image: husarion/navigation2:galactic
     restart: unless-stopped
     volumes:
-      - ./config/amcl_params.yaml:/amcl_params.yaml
+      - ./config/${AMCL_PARAMS:-amcl_params.yaml}:/amcl_params.yaml
       - ./maps:/maps
     command: >
       ros2 launch nav2_bringup localization_launch.py    
