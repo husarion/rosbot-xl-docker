@@ -8,7 +8,10 @@ amcl:
 
     scan_topic: scan_filtered
 
+    # Galactic
     robot_model_type: differential
+    # Humble
+    # robot_model_type: nav2_amcl::DifferentialMotionModel
 
     set_initial_pose: True
     always_reset_initial_pose: True
