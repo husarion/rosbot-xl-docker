@@ -67,45 +67,37 @@ controller_server:
 
     controller_plugins: ["FollowPath"]
     FollowPath:
-      # Shim controller first rotates robot in place to orientation of global path
-      # and the switches to DWB - otherwise DWB won't turn in place, but with arc, which
-      # is less optimal
-      plugin: "nav2_rotation_shim_controller::RotationShimController"
-      primary_controller: "dwb_core::DWBLocalPlanner"
-      angular_dist_threshold: 1.57
-      forward_sampling_distance: 0.5
-      rotate_to_heading_angular_vel: 1.5
-      max_angular_accel: 4.0
-      simulate_ahead_time: 1.0
+      plugin: "dwb_core::DWBLocalPlanner"
 
       debug_trajectory_details: True
 
-      min_vel_x: 0.0
-      max_vel_x: 0.5
-      acc_lim_x: 1.0
-      decel_lim_x: -0.5
-      min_speed_xy: 0.007
-      max_speed_xy: 0.5
+      min_vel_x: -0.35
+      max_vel_x: 0.35
+      acc_lim_x: 0.35
+      decel_lim_x: -0.35
 
-      max_vel_theta: 1.5
-      min_speed_theta: 0.4
-      acc_lim_theta: 4.0
-      decel_lim_theta: -4.0
+      min_speed_xy: 0.01
+      max_speed_xy: 0.35
 
-      min_vel_y: 0.0
-      max_vel_y: 0.5
-      acc_lim_y: 1.0
-      decel_lim_y: -0.5
+      max_vel_theta: 1.0
+      min_speed_theta: 0.2
+      acc_lim_theta: 1.0
+      decel_lim_theta: -1.0
 
-      vx_samples: 20
-      vy_samples: 20
-      vtheta_samples: 20
+      min_vel_y: -0.35
+      max_vel_y: 0.35
+      acc_lim_y: 0.35
+      decel_lim_y: -0.35
+
+      vx_samples: 8
+      vy_samples: 8
+      vtheta_samples: 8
 
       transform_tolerance: 1.0
       short_circuit_trajectory_evaluation: True
 
       trajectory_generator_name: "dwb_plugins::StandardTrajectoryGenerator"
-      sim_time: 0.75 # low value to avoid slow movement near goal
+      sim_time: 1.0 # low value to avoid slow movement near goal
       discretize_by_time: False
       linear_granularity: 0.05
       angular_granularity: 0.025
@@ -116,32 +108,25 @@ controller_server:
         [
           "BaseObstacle",
           "ObstacleFootprint",
-
-          "GoalAlign",
           "GoalDist",
-
-          "PathAlign",
           "PathDist",
-
-          "RotateToGoal",
           "Oscillation",
+          "RotateToGoal",
         ]
+      # GoalAlign and PathAlign critics were removed to make robot omnidirectional
 
       BaseObstacle.scale: 0.02
-
-      GoalAlign.scale: 24.0
-      GoalAlign.forward_point_distance: 0.1
-      GoalDist.scale: 24.0
-
-      PathAlign.scale: 32.0
-      PathAlign.forward_point_distance: 0.1
+      ObstacleFootprint.scale: 0.1
+      GoalDist.scale: 32.0
       PathDist.scale: 32.0
+      Oscillation.scale: 1.0
 
       xy_goal_tolerance: 0.1
-      trans_stopped_velocity: 0.25
+      trans_stopped_velocity: 0.1
       RotateToGoal.scale: 32.0
       RotateToGoal.slowing_factor: 5.0
       RotateToGoal.lookahead_time: -1.0
+      RotateToGoal.xy_goal_tolerance: 0.1
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -170,12 +155,15 @@ local_costmap:
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
+        enabled: True
         map_subscribe_transient_local: True # QoS setting; durability policy transient local, combined with any depth, provides functionality similar to that of latching publishers
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
         observation_sources: scan
         scan:
           topic: /scan_filtered
+          max_obstacle_height: 2.0
           clearing: True
           marking: True
           data_type: "LaserScan"
@@ -185,6 +173,7 @@ local_costmap:
           obstacle_min_range: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: True
         cost_scaling_factor: 3.0
         inflation_radius: 0.55
 
@@ -212,9 +201,11 @@ global_costmap:
       track_unknown_space: True # if false, treats unknown space as free space, else as unknown space
 
       footprint: "[[0.165, 0.145], [0.165, -0.145], [-0.165, -0.145], [-0.165, 0.145]]"
+
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
+        enabled: True
         map_subscribe_transient_local: True
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -232,6 +223,7 @@ global_costmap:
           obstacle_min_range: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: True
         cost_scaling_factor: 3.0
         inflation_radius: 0.55
 
