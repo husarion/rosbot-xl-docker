@@ -82,6 +82,7 @@ controller_server:
 
       min_vel_x: 0.0
       max_vel_x: 0.5
+      # todo: should decel be lower?
       acc_lim_x: 1.0
       decel_lim_x: -0.5
       min_speed_xy: 0.007
@@ -170,12 +171,15 @@ local_costmap:
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
+        enabled: True
         map_subscribe_transient_local: True # QoS setting; durability policy transient local, combined with any depth, provides functionality similar to that of latching publishers
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
         observation_sources: scan
         scan:
           topic: /scan_filtered
+          max_obstacle_height: 2.0
           clearing: True
           marking: True
           data_type: "LaserScan"
@@ -185,6 +189,7 @@ local_costmap:
           obstacle_min_range: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: True
         cost_scaling_factor: 3.0
         inflation_radius: 0.55
 
@@ -212,9 +217,11 @@ global_costmap:
       track_unknown_space: True # if false, treats unknown space as free space, else as unknown space
 
       footprint: "[[0.165, 0.145], [0.165, -0.145], [-0.165, -0.145], [-0.165, 0.145]]"
+
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
+        enabled: True
         map_subscribe_transient_local: True
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -232,6 +239,7 @@ global_costmap:
           obstacle_min_range: 0.0
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: True
         cost_scaling_factor: 3.0
         inflation_radius: 0.55
 
