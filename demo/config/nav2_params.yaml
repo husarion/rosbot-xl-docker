@@ -75,16 +75,17 @@ controller_server:
       angular_dist_threshold: 0.4 # quite low value to avoid moving in arc
       forward_sampling_distance: 0.5
       rotate_to_heading_angular_vel: 1.5
-      max_angular_accel: 4.0
+      # I'm not sure why, but ang vel is limited max_angular_accel param divided by 10
+      # actual acceleration will be limited by controller, so it can be set to highger value
+      max_angular_accel: 10.0
       simulate_ahead_time: 1.0
 
       debug_trajectory_details: True
 
       min_vel_x: 0.0
       max_vel_x: 0.5
-      # todo: should decel be lower?
       acc_lim_x: 1.0
-      decel_lim_x: -0.5
+      decel_lim_x: -1.0
       min_speed_xy: 0.007
       max_speed_xy: 0.5
 
