@@ -5,7 +5,7 @@ on:
     branches:
       - "main"
   repository_dispatch:
-    types: [ros-package-update]
+    # types: [ros-package-update]
 
 jobs:
   build:
