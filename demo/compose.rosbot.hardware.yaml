@@ -19,5 +19,5 @@ services:
     image: husarion/rplidar:humble
     restart: unless-stopped
     devices:
-      - /dev/ttyUSB0
-    command: ros2 launch sllidar_ros2 sllidar_launch.py
+      - /dev/ttyUSB1
+    command: ros2 launch sllidar_ros2 sllidar_launch.py serial_baudrate:=${RPLIDAR_BAUDRATE:-256000} serial_port:=/dev/ttyUSB1
