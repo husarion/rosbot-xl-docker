@@ -1,5 +1,8 @@
 # Quick Start (at fist stop ROS Master if working on host)
-# $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.vpn.yaml up
+# Mapping:
+# $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.mapping.yaml -f compose.rosbot.vpn.yaml up
+# Or localization: 
+# $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.localization.yaml -f compose.rosbot.vpn.yaml up
 
 services:
   microros:
@@ -9,7 +12,8 @@ services:
       - ./dds-config.xml:/dds-config.xml
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
 
   rplidar:
     network_mode: host
@@ -18,7 +22,8 @@ services:
       - ./dds-config.xml:/dds-config.xml
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
 
   rosbot-xl:
     network_mode: host
@@ -27,7 +32,8 @@ services:
       - ./dds-config.xml:/dds-config.xml
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
 
   navigation:
     network_mode: host
@@ -36,7 +42,8 @@ services:
       - ./dds-config.xml:/dds-config.xml
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
 
   localization-mapping:
     network_mode: host
@@ -45,4 +52,5 @@ services:
       - ./dds-config.xml:/dds-config.xml
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
-      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
