@@ -1,5 +1,8 @@
 # Quick Start
-# $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.lan.yaml up
+# Mapping:
+# $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.mapping.yaml -f compose.rosbot.lan.yaml up
+# Or localization: 
+# $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.localization.yaml -f compose.rosbot.lan.yaml up
 
 services:
   microros:
