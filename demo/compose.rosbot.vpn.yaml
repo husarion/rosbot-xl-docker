@@ -7,9 +7,10 @@
 services:
   microros:
     network_mode: host
-    ipc: host
+    # ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
+      - ./micro_ros_entrypoint.sh:/micro-ros_entrypoint.sh
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
@@ -17,7 +18,7 @@ services:
 
   rplidar:
     network_mode: host
-    ipc: host
+    # ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
@@ -27,7 +28,7 @@ services:
 
   rosbot-xl:
     network_mode: host
-    ipc: host
+    # ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
@@ -37,7 +38,7 @@ services:
 
   navigation:
     network_mode: host
-    ipc: host
+    # ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
@@ -47,7 +48,7 @@ services:
 
   localization-mapping:
     network_mode: host
-    ipc: host
+    # ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
