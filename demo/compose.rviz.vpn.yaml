@@ -6,7 +6,7 @@ services:
 
   rviz:
     network_mode: host
-    # ipc: host
+    ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:

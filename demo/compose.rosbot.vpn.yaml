@@ -1,4 +1,4 @@
-# Quick Start (at fist stop ROS Master if working on host)
+# Quick Start
 # Mapping:
 # $ docker compose -f compose.rosbot.hardware.yaml -f compose.rosbot.mapping.yaml -f compose.rosbot.vpn.yaml up
 # Or localization: 
@@ -7,7 +7,7 @@
 services:
   microros:
     network_mode: host
-    # ipc: host
+    ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
       - ./micro_ros_entrypoint.sh:/micro-ros_entrypoint.sh
@@ -18,7 +18,7 @@ services:
 
   rplidar:
     network_mode: host
-    # ipc: host
+    ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
@@ -28,7 +28,7 @@ services:
 
   rosbot-xl:
     network_mode: host
-    # ipc: host
+    ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
@@ -38,7 +38,7 @@ services:
 
   navigation:
     network_mode: host
-    # ipc: host
+    ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
@@ -48,7 +48,7 @@ services:
 
   localization-mapping:
     network_mode: host
-    # ipc: host
+    ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
     environment:
