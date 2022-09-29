@@ -41,10 +41,10 @@ Both cases are presented in three setups:
 > sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 > ```
 >
-> Change `/var/run/docker.sock` permissions, so every user can can run docker commands without `sudo`:
+> Add your user to docker group, so that you will be able to run docker commands without `sudo` (it needs reboot to take effect):
 >
 > ```bash
-> sudo chmod 666 /var/run/docker.sock
+> sudo usermod -aG docker $USER
 > ```
 
 ## Quick start (with a physical ROSbot XL)
@@ -398,7 +398,14 @@ By using the **[2D Pose Estimate]** button manualy tell the ROSbot where on the 
 
 and tell the ROSbot where to go autonomously with **[Nav2 Goal]** button.
 
-## Quick start (simulation model of ROSbot in Gazebo)
+## Other configurations
+
+### Mecanum
+
+### Pure pursuit
+
+
+<!-- ## Quick start (simulation model of ROSbot in Gazebo) -->
 
 <!--
 ### 1. Clone this repo **on your laptop**
