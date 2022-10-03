@@ -15,7 +15,7 @@
                 <userTransports>
                     <transport_id>HusarnetTransport</transport_id>
                 </userTransports>
-                <useBuiltinTransports>false</useBuiltinTransports>
+                <useBuiltinTransports>true</useBuiltinTransports>
                 <builtin>
                     <initialPeersList>
                         <locator>
