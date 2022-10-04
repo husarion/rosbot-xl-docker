@@ -1,2 +1,5 @@
 .vscode/
 **/.env
+**/dds-config.xml
+dev_utils/
+demo/robot_model/
