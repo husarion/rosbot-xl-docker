@@ -81,10 +81,10 @@ modify it if needed (see comments)
 # ======================================================
 
 # RPLIDAR A2
-RPLIDAR_BAUDRATE=115200
+# RPLIDAR_BAUDRATE=115200
 
 # RPLIDAR A3 and RPLIDAR S1
-# RPLIDAR_BAUDRATE=256000
+RPLIDAR_BAUDRATE=256000
 
 # ======================================================
 # For simulation example you need to use simulation time
@@ -95,8 +95,23 @@ USE_SIM_TIME=False
 
 # for a Gazebo simulation
 # USE_SIM_TIME=True
+
+# ======================================================
+# Mecanum and navigation parameters
+# ======================================================
+
+MECANUM=True
+# NAV2_PARAMS=nav2_params_mecanum.yaml
+AMCL_PARAMS=amcl_params_mecanum.yaml
+
+# MECANUM=False
+# NAV2_PARAMS=nav2_params.yaml
+# AMCL_PARAMS=amcl_params.yaml
+
+NAV2_PARAMS=nav2_params_pure_pursuit.yaml
 ```
 
+<!-- todo: can't be changed because of microros -->
 If you have other ROS 2 devices running in your LAN network make sure to provide an unique `ROS_DOMAIN_ID` (the default value is `ROS_DOMAIN_ID=0`). Note that if you run the demo example in a **simulation** it is necessary to define the `USE_SIM_TIME` variable to `True`.
 
 ### 3. Sync your workspace with the ROSbot
@@ -129,27 +144,7 @@ In order to allow changes on ROSbot to affect demo directory on your PC (for exa
 rosbot-docker/demo/sync_with_rosbot.sh 10.5.10.64 --bidirectional
 ```
 
-### 4. Flash the microcontroller
-
-<!-- To flash the right firmware, open ROSbot's terminal or connect via `ssh` and execute this command:
-
-- for differential drive (regular wheels):
-
-```bash
-docker run --rm -it --privileged \
-husarion/rosbot:noetic \
-/flash-firmware.py /root/firmware_diff.bin
-```
-
-- for omnidirectional wheeled ROSbot (mecanum wheels):
-
-```bash
-docker run --rm -it --privileged \
-husarion/rosbot:noetic \
-/flash-firmware.py /root/firmware_mecanum.bin
-``` -->
-
-### 5. [Optional] VPN config
+### 4. [Optional] VPN config
 
 If in the next steps you want to run VPN configuration to make your system working **not only in LAN but also over the Internet** get your Husarnet Join Code and use it for connecting your ROSbot and laptop to the same Husarnet network.
 
@@ -188,7 +183,7 @@ To do so, based on `dds-config.template.xml` file create the `dds-config.xml` fi
 >
 > FastDDS version preinstalled in ROS 2 Humble allows you to use Husarnet hostnames instead of IPv6 addresses.
 
-### 6. Create a map
+### 5. Create a map
 
 > **Tip no. 4** 💡
 >
@@ -302,7 +297,7 @@ Your map has been saved in docker volume and is available in the `maps/` folder.
 
 Mapping phase is completed, you can stop / remove all running containers on ROSbot.
 
-### 7. Localization on an already created map
+### 6. Localization on an already created map
 
 Depending on the network configuration (LAN/VPN) execute the chosen pair of commands in the PC or ROSbot's terminal:
 
@@ -400,92 +395,12 @@ and tell the ROSbot where to go autonomously with **[Nav2 Goal]** button.
 
 ## Other configurations
 
+There are also other configurations of navigation parameters. To use them you have to edit your `.env` file
+
 ### Mecanum
+
+Although mecanum wheels will work as well on default configs, you can use these ones to take advantage of additional degree of freedom. It is necessary to change two env variables - `AMCL_PARAMS` (`robot_model_type` switched to omnidirectional) and `NAV2_PARAMS`. In this demo `DWBLocalPlanner` is configured to move only in x and y position ignoring orientation.
 
 ### Pure pursuit
 
-
-<!-- ## Quick start (simulation model of ROSbot in Gazebo) -->
-
-<!--
-### 1. Clone this repo **on your laptop**
-
-```bash
-git clone https://github.com/husarion/rosbot-docker/
-```
-
-### 2. Prepare `demo/.env` file
-
-```bash
-cd rosbot-docker/demo/autonomous_navigation_mapping/
-cp .env.template .env
-```
-
-modify it if needed (see comments)
-
-```bash
-# ======================================================
-# SBC <> STM32 serial connection.
-# ======================================================
-
-# SERIAL_PORT=/dev/ttyS4     # ROSbot 2 PRO
-SERIAL_PORT=/dev/ttyAMA0   # ROSbbot 2R
-
-# ======================================================
-# Serial baudrate for rplidar driver
-# ======================================================
-
-RPLIDAR_BAUDRATE=115200     # RPLIDAR A2
-# RPLIDAR_BAUDRATE=256000     # RPLIDAR A3
-
-# ======================================================
-# For simulation example you need to use simulation time
-# ======================================================
-
-# USE_SIM_TIME=False      # for a physical ROSbot
-USE_SIM_TIME=True       # for a Gazebo simulation
-```
-
-### 3. Create a map
-
-On your PC with launch:
-
-```bash
-xhost local:root
-```
-
-```bash
-docker compose \
--f compose.rosbot.simulation.yaml \
--f compose.rosbot.mapping.yaml \
--f compose.rviz.yaml \
-up
-```
-
-In the Rviz2 window, click the **[Startup]** button in the "**Navigation 2**" field.
-
-Prepare a map with Rviz2 by driving the ROSbot around using the **[Nav2 Goal]** button.
-
-After you create the map, open a new terminal on ROSbot, navigate to `demo/autonomous_navigation_mapping/` folder and execute:
-
-```bash
-./map-save.sh
-```
-
-### 4. Localization on an already created map
-
-Next launch `Navigation2` stack with `AMLC`:
-
-```bash
-xhost local:root
-```
-
-```bash
-docker compose \
--f compose.rosbot.simulation.yaml \
--f compose.rosbot.localization.yaml \
--f compose.rviz.yaml \
-up
-```
-
-By using the **[2D Pose Estimate]** button manualy tell the ROSbot where on the existing map is its starting position and tell the ROSbot where to go autonomously by using the **[Nav2 Goal]** button. -->
+This config uses different controller - `RegulatedPurePursuitController` instead of `DWBLocalPlanner` used in default config. When compared to DWB movement should be smoother. To use it you have set `NAV2_PARAMS` to `nav2_params_pure_pursuit.yaml`.

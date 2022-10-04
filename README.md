@@ -6,17 +6,8 @@ Docker images for ROSbot XL
 
 Official ROSbot XL docker images built from this repo are available here: https://hub.docker.com/r/husarion/rosbot-xl/tags
 
-- `husarion/rosbot-xl:galactic` - the image for a real (physical) robot
-- `husarion/rosbot-xl:galactic-simulation` - the image with built-in Gazebo simulation model
-
-<!-- Docker Image for ROS Melodic Node providing interface for STM32 firmware over ROS-serial.
-
-`rosbot-xl-docker` contain following ROS packages:
-
-- [rosbot_ros](https://github.com/husarion/rosbot_ros)
-- [rosbot_ekf](https://github.com/husarion/rosbot_ekf)
-
-With _docker-compose_ configuration shown in [demo](./demo) it can communicate with hardware of both Rosbot 2.0 and Rosbot 2.0 Pro. -->
+- `husarion/rosbot-xl:humble` - the image for a real (physical) robot
+<!-- - `husarion/rosbot-xl:humble-simulation` - the image with built-in Gazebo simulation model -->
 
 ## Flashing the firmware
 
@@ -29,7 +20,7 @@ Execute in a termianl on your laptop:
 ```bash
 docker run --rm -it \
 --device /dev/ttyUSB0:/dev/ttyUSB0 \
-husarion/rosbot-xl:galactic \
+husarion/rosbot-xl:humble \
 /stm32flash -w /firmware.bin -b 115200 -v /dev/ttyUSB0
 ```
 
@@ -45,34 +36,47 @@ docker buildx build \
 .
 ```
 
-<!-- ## ROS node
+## ROS node
 
-Most important nodes published by this docker after launching [rosbot_docker.launch](https://github.com/husarion/rosbot_ros/blob/melodic/src/rosbot_bringup/launch/rosbot_docker.launch) are shown below. -->
+Use `bringup.launch.py` from `rosbot_xl_bringup` to start all base functionalities for ROSbot XL. It consists of following parts:
+- `scan_to_scan_filter_chain` from `laser_filters`, it subscribes to `/scan` topic and removes all points that are within robots footprint (defined by config `laser_filter.yaml` in `rosbot_xl_bringup` package). Filtered laserscan is then published on `/scan_filtered` topic
+  
+  **Subscribes**
+  - `/scan` (_sensor_msgs/LaserScan_)
+  
+  **Publishes**
+  - `/scan_filtered` (_sensor_msgs/LaserScan_)
 
-### Subscribes
+- `ekf_node` from `robot_localization`, it is used to fuse wheel odometry and IMU data. Parameters are defined in `ekf.yaml` in `rosbot_xl_bringup/config`. It subscribes to `/rosbot_xl_base_controller/odom` and `/imu_broadcaster/imu` published by ros2 controllers and publishes fused odometry on `/odometry/filtered` topic
 
-<!-- - `/cmd_vel` (_geometry_msgs/Twist_, **/serial_bridge**) -->
+  **Subscribes**
+  - `/rosbot_xl_base_controller/odom` (_nav_msgs/Odometry_)
+  - `/imu_broadcaster/imu` (_sensor_msgs/Imu_)
+  
+  **Publishes**
+  - `/tf` (_tf2_msgs/TFMessage_) - `base_link`->`odom` transform
+  - `/odometry/filtered` (_nav_msgs/Odometry_)
 
-### Publishes
 
-<!-- - `/tf` (_tf2_msgs/TFMessage_, **/rosbot_ekf**)
-- `/tf_static` (_tf2_msgs/TFMessage_, **/imu_publisher**, **/laser_publisher**, **/camera_publisher**)
-- `/odom` (_nav_msgs/Odometry_, **/rosbot_ekf**)
-- `/imu` (_sensor_msgs/Imu_, **/serial_bridge**)
-- `/battery` (_sensor_msgs/BatteryState_, **/serial_bridge**)
-- `/range/fl` (_sensor_msgs/Range_, **/serial_bridge**)
-- `/range/fr` (_sensor_msgs/Range_, **/serial_bridge**)
-- `/range/rl` (_sensor_msgs/Range_, **/serial_bridge**)
-- `/range/rr` (_sensor_msgs/Range_, **/serial_bridge**)
+- `controller.launch.py` from `rosbot_xl_hardware`, it loads robot model defined in `rosbot_xl_description` as well as ros2 control [rosbot_hardware_interfaces](https://github.com/husarion/rosbot_hardware_interfaces). It also starts controllers: 
+  * `joint_state_broadcaster`
+  * `rosbot_xl_base_controller` - depending on the value of `mecanum` argument it can be `DiffDriveController` or `MecanumDriveController`
+  * `imu_broadcaster`
 
-For more details on what is being published and subscribed by nodes running in this container please refer to launch file and packages:
-
-- [rosbot_ros](https://github.com/husarion/rosbot_ros)
-- [rosbot_ekf](https://github.com/husarion/rosbot_ekf)
-- [rosbot-stm32-firmware](https://github.com/husarion/rosbot-stm32-firmware) -->
+  **Subscribes**
+  - `/cmd_vel` (_geometry_msgs/Twist_)
+  - `/_motors_responses` (_sensor_msgs/JointState_)
+  - `/_imu/data_raw` (_sensor_msgs/Imu_)
+  
+  **Publishes**
+  - `/tf` (_tf2_msgs/TFMessage_)
+  - `/tf_static` (_tf2_msgs/TFMessage_)
+  - `/_motors_cmd` (_std_msgs/Float32MultiArray_)
+  - `/rosbot_xl_base_controller/odom` (_nav_msgs/Odometry_)
+  - `/imu_broadcaster/imu` (_sensor_msgs/Imu_)
 
 ## Autonomous Navigation Demo
 
 In a [/demo](/demo) folder your will find an example of how to use ROSbot docker image in a real autonomous navigation use case.
 
-<!-- ![](demo/autonomous_navigation_mapping/.docs/rviz_mapping.png) -->
+<!-- ![](demo/.docs/rviz_mapping.png) -->
