@@ -3,6 +3,11 @@
 
 services:
   navigation:
+    healthcheck:
+      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /map | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      interval: 1s
+      timeout: 5s
+      retries: 50
     # there is a problem with obstacle layer on humble, so temporarily galactic should be used 
     # https://github.com/ros-planning/navigation2/issues/3014
     image: husarion/navigation2:galactic
@@ -13,17 +18,18 @@ services:
       # modified behaviour tree that doesn't replan global path
       # (it is used only when specified by default_nav_to_pose_bt_xml parameter)
       - ./config/navigate_w_recovery.xml:/navigate_w_recovery.xml
-    command: >
-      ros2 launch nav2_bringup navigation_launch.py    
-        params_file:=/nav2_params.yaml
+    command: ros2 launch nav2_bringup navigation_launch.py params_file:=/nav2_params.yaml
 
   localization-mapping:
+    healthcheck:
+      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /map | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      interval: 1s
+      timeout: 5s
+      retries: 50
     image: husarion/slam-toolbox:humble
     container_name: slam-toolbox
     restart: unless-stopped
     volumes:
       - ./config/slam_toolbox_params.yaml:/slam_params.yaml
       - ./maps:/maps
-    command: >
-      ros2 launch slam_toolbox online_sync_launch.py 
-        slam_params_file:=/slam_params.yaml
+    command: ros2 launch slam_toolbox online_sync_launch.py slam_params_file:=/slam_params.yaml

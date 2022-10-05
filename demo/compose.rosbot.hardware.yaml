@@ -3,6 +3,11 @@
 
 services:
   rosbot-xl:
+    healthcheck:
+      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /imu_broadcaster/imu | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      interval: 1s
+      timeout: 5s
+      retries: 50
     image: husarion/rosbot-xl:humble
     build:
       context: ./../
@@ -11,13 +16,25 @@ services:
     command: ros2 launch rosbot_xl_bringup bringup.launch.py mecanum:=${MECANUM:-False}
 
   microros:
+    healthcheck:
+      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /_motors_response | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      interval: 1s
+      timeout: 5s
+      retries: 50
     image: microros/micro-ros-agent:humble
     restart: unless-stopped
     command: udp4 --port 8888
 
   rplidar:
+    healthcheck:
+      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /scan | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      interval: 1s
+      timeout: 5s
+      retries: 50
     image: husarion/rplidar:humble
     restart: unless-stopped
     devices:
-      - /dev/ttyUSB1
-    command: ros2 launch sllidar_ros2 sllidar_launch.py serial_baudrate:=${RPLIDAR_BAUDRATE:-256000} serial_port:=/dev/ttyUSB1
+      - /dev/ttyUSB0
+    volumes:
+      - ./config/sllidar_launch.py:/sllidar_launch.py
+    command: ros2 launch /sllidar_launch.py serial_baudrate:=${RPLIDAR_BAUDRATE:-256000} serial_port:=/dev/ttyUSB0 scan_mode:=Standard

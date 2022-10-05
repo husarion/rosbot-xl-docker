@@ -35,16 +35,11 @@ services:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
-
-  navigation:
-    network_mode: host
-    ipc: host
-    volumes:
-      - ./dds-config.xml:/dds-config.xml
-    environment:
-      - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
-      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
-      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
+    depends_on:
+      microros:
+        condition: service_healthy
+      rplidar:
+        condition: service_healthy
 
   localization-mapping:
     network_mode: host
@@ -55,3 +50,19 @@ services:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
+    depends_on:
+      rosbot-xl:
+        condition: service_healthy
+
+  navigation:
+    network_mode: host
+    ipc: host
+    volumes:
+      - ./dds-config.xml:/dds-config.xml
+    environment:
+      - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
+    depends_on:
+      localization-mapping:
+        condition: service_healthy
