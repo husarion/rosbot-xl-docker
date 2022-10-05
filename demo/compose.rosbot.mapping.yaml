@@ -11,7 +11,7 @@ services:
       - ./maps:/maps
     command: ros2 launch slam_toolbox online_sync_launch.py slam_params_file:=/slam_params.yaml
     healthcheck:
-      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /map | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      test: "if [ $$(. /opt/ros/$$ROS_DISTRO/setup.sh ; ros2 topic info /map | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
       interval: 1s
       timeout: 5s
       retries: 50
@@ -32,7 +32,7 @@ services:
       - ./config/navigate_w_recovery.xml:/navigate_w_recovery.xml
     command: ros2 launch nav2_bringup navigation_launch.py params_file:=/nav2_params.yaml
     healthcheck:
-      test: "if [ $$(. /opt/ros/humble/setup.sh ; ros2 topic info /map | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      test: "if [ $$(. /opt/ros/$$ROS_DISTRO/setup.sh ; ros2 topic info /local_costmap/costmap | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
       interval: 1s
       timeout: 5s
       retries: 50
