@@ -5,15 +5,15 @@
 
 # If "bidirectional" flag is set, synchronize folders on PC and ROSbot using unison. Otherwise copy files with rsync
 if [ "$2" == "--bidirectional" ]; then
-    sshpass -p "husarion" unison -batch ./ ssh://husarion@$1/rosbot-docker-demo
+    sshpass -p "husarion" unison -batch ./ ssh://husarion@$1/rosbot-xl-docker-demo
 
     while inotifywait -r -e modify,create,delete,move ./ ; do 
-        sshpass -p "husarion" unison -batch ./ ssh://husarion@$1/rosbot-docker-demo
+        sshpass -p "husarion" unison -batch ./ ssh://husarion@$1/rosbot-xl-docker-demo
     done
 else
-    sshpass -p "husarion" rsync -vRr ./ husarion@$1:/home/husarion/rosbot-docker-demo
+    sshpass -p "husarion" rsync -vRr ./ husarion@$1:/home/husarion/rosbot-xl-docker-demo
 
     while inotifywait -r -e modify,create,delete,move ./ ; do 
-        sshpass -p "husarion" rsync -vRr ./ husarion@$1:/home/husarion/rosbot-docker-demo
+        sshpass -p "husarion" rsync -vRr ./ husarion@$1:/home/husarion/rosbot-xl-docker-demo
     done
 fi
