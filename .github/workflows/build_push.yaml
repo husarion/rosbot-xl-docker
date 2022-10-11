@@ -6,7 +6,8 @@ on:
       - "main"
   repository_dispatch:
     types: [ros-package-update]
-
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: ubuntu-20.04
