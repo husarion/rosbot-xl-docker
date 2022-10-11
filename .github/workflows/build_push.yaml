@@ -7,7 +7,7 @@ on:
   repository_dispatch:
     types: [ros-package-update]
   workflow_dispatch:
-  
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -47,5 +47,5 @@ jobs:
           platforms: linux/arm64, linux/amd64
           push: true
           tags: husarion/rosbot-xl:${{ matrix.docker-tag }}
-          cache-from: type=registry,ref=husarion/rosbot-xl:${{ matrix.docker-tag }}
+          # cache-from: type=registry,ref=husarion/rosbot-xl:${{ matrix.docker-tag }}
           cache-to: type=inline
