@@ -16,9 +16,9 @@ jobs:
       matrix:
         include:
           - dockerfile: Dockerfile.hardware
-            docker-tag: humble
+            docker_tag: humble
           # - dockerfile: Dockerfile.simulation
-          #   docker-tag: humble-simulation
+          #   docker_tag: humble-simulation
 
     steps:
       - name: Checkout
@@ -38,6 +38,17 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Set docker image tags
+        env:
+          MATRIX_DOCKER_TAG: ${{ matrix.docker_tag }}
+          IMAGE_VERSION: ${{ github.event.client_payload.image_version }}
+        run: |
+          if [[ ${IMAGE_VERSION} != '' ]]; then
+            echo "TAGS=husarion/rosbot-xl:${MATRIX_DOCKER_TAG},husarion/rosbot-xl:${MATRIX_DOCKER_TAG}-${IMAGE_VERSION}" >> $GITHUB_ENV
+          else
+            echo "TAGS=husarion/rosbot-xl:${MATRIX_DOCKER_TAG}" >> $GITHUB_ENV
+          fi
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -46,6 +57,6 @@ jobs:
           file: ${{ matrix.dockerfile }}
           platforms: linux/arm64, linux/amd64
           push: true
-          tags: husarion/rosbot-xl:${{ matrix.docker-tag }}
-          # cache-from: type=registry,ref=husarion/rosbot-xl:${{ matrix.docker-tag }}
+          tags: ${{ env.TAGS }}
+          # cache-from: type=registry,ref=husarion/rosbot-xl:${{ matrix.docker_tag }}
           cache-to: type=inline
