@@ -43,7 +43,7 @@ RUN apt-get update && apt-get install -y \
     # --packages-up-to rosbot_xl - no longer works, there are other packages to build rosbot_controller, have to fix dependencies
     colcon build && \
     # download a firmware binary release
-    curl -L https://github.com/husarion/rosbot_xl_firmware/releases/download/v0.0.2/firmware.bin -o /firmware.bin && \
+    curl -L https://github.com/husarion/rosbot_xl_firmware/releases/download/v0.0.3/firmware.bin -o /firmware.bin && \
     # make the image smaller
     export SUDO_FORCE_REMOVE=yes && \
     apt-get remove -y \
