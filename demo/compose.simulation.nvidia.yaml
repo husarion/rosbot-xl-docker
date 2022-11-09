@@ -3,12 +3,14 @@ services:
     image: husarion/rosbot-xl:humble-simulation
     container_name: rosbot_xl_simulation
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix
     network_mode: host
     ipc: host
+    runtime: nvidia
     environment:
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
-      - DISPLAY=${DISPLAY}
-      - LIBGL_ALWAYS_SOFTWARE=1
     command: ros2 launch rosbot_xl_gazebo simulation.launch.py
