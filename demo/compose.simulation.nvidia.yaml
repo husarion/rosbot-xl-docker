@@ -1,5 +1,12 @@
+# Quick Start
+# $ xhost local:root
+# Mapping:
+# $ docker compose -f compose.simulation.nvidia.yaml -f compose.rosbot.mapping.yaml up
+# Or localization: 
+# $ docker compose -f compose.simulation.nvidia.yaml -f compose.rosbot.localization.yaml up
+
 services:
-  rosbot_xl_simulation:
+  rosbot-xl:
     image: husarion/rosbot-xl:humble-simulation
     container_name: rosbot_xl_simulation
     volumes:
@@ -14,3 +21,22 @@ services:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
     command: ros2 launch rosbot_xl_gazebo simulation.launch.py
+    healthcheck:
+      test: "if [ $$(. /opt/ros/$$ROS_DISTRO/setup.sh ; ros2 topic info /imu_broadcaster/imu | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+      interval: 1s
+      timeout: 5s
+      retries: 50
+  
+  localization-mapping:
+    network_mode: host
+    ipc: host
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
+
+  navigation:
+    network_mode: host
+    ipc: host
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
