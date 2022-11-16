@@ -16,10 +16,10 @@ services:
     image: husarion/rplidar:humble
     restart: unless-stopped
     devices:
-      - /dev/ttyUSB1
+      - /dev/rplidar
     volumes:
       - ./config/sllidar_launch.py:/sllidar_launch.py
-    command: ros2 launch /sllidar_launch.py serial_baudrate:=${RPLIDAR_BAUDRATE:-256000} serial_port:=/dev/ttyUSB1 scan_mode:=Standard
+    command: ros2 launch /sllidar_launch.py serial_baudrate:=${RPLIDAR_BAUDRATE:-256000} serial_port:=/dev/rplidar scan_mode:=Standard
     healthcheck:
       test: "if [ $$(. /opt/ros/$$ROS_DISTRO/setup.sh ; ros2 topic info /scan | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
       interval: 1s
