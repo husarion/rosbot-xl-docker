@@ -9,9 +9,9 @@ amcl:
     scan_topic: scan_filtered
 
     # Galactic
-    robot_model_type: omnidirectional
+    # robot_model_type: omnidirectional
     # Humble
-    # robot_model_type: nav2_amcl::OmniMotionModel
+    robot_model_type: nav2_amcl::OmniMotionModel
 
     set_initial_pose: True
     always_reset_initial_pose: True
