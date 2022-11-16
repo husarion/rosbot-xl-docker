@@ -1,0 +1,10 @@
+# Quick Start
+# $ docker compose -f compose.joy.yaml -f compose.joy.lan.yaml up
+
+services:
+  joy2twist:
+    network_mode: host
+    ipc: host
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
