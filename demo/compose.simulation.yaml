@@ -16,7 +16,7 @@ services:
     ipc: host
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
-      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_fastrtps_cpp}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
       - DISPLAY=${DISPLAY}
       - LIBGL_ALWAYS_SOFTWARE=1
     command: ros2 launch rosbot_xl_gazebo simulation.launch.py
