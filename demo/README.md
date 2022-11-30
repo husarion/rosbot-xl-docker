@@ -58,7 +58,7 @@ git clone https://github.com/husarion/rosbot-xl-docker/
 ### 2. Prepare `demo/.env` file
 
 ```bash
-cd rosbot-docker/demo
+cd rosbot-xl-docker/demo
 cp .env.template .env
 ```
 
@@ -131,7 +131,7 @@ In the `demo/` folder, there is a script for auto-syncing of this repo with your
 If IP address of your robot in LAN is `10.5.10.64`, run (it uses `rsync` for synchronization):
 
 ```bash
-rosbot-docker/demo/sync_with_rosbot.sh 10.5.10.64
+rosbot-xl-docker/demo/sync_with_rosbot.sh 10.5.10.64
 ```
 
 > **Tip no. 1** 💡
@@ -141,7 +141,7 @@ rosbot-docker/demo/sync_with_rosbot.sh 10.5.10.64
 In order to allow changes on ROSbot to affect demo directory on your PC (for example for viewing saved map) use `--bidirectional` flag (it uses `unison` for that):
 
 ```bash
-rosbot-docker/demo/sync_with_rosbot.sh 10.5.10.64 --bidirectional
+rosbot-xl-docker/demo/sync_with_rosbot.sh 10.5.10.64 --bidirectional
 ```
 
 ### 4. [Optional] VPN config
@@ -285,7 +285,7 @@ After about 35 seconds, you should see the ROSbot model in the Rviz window:
 
 ![](./.docs/rviz_mapping.png)
 
-Prepare map with Rviz2 using the **[Nav2 Goal]** button on the top bar.
+Prepare map with Rviz2 using the **[2D Goal Pose]** button on the top bar.
 
 After you create the map, open a new terminal on ROSbot, navigate to `demo/` folder and execute:
 
@@ -391,7 +391,7 @@ By using the **[2D Pose Estimate]** button manualy tell the ROSbot where on the 
 
 ![](./.docs/rviz_localization_pose_estimate.png)
 
-and tell the ROSbot where to go autonomously with **[Nav2 Goal]** button.
+and tell the ROSbot where to go autonomously with **[2D Goal Pose]** button.
 
 ## Other configurations
 
@@ -404,3 +404,62 @@ Although mecanum wheels will work as well on default configs, you can use these 
 ### Pure pursuit
 
 This config uses different controller - `RegulatedPurePursuitController` instead of `DWBLocalPlanner` used in default config. When compared to DWB movement should be smoother. To use it you have set `NAV2_PARAMS` to `nav2_params_pure_pursuit.yaml`.
+
+## Quick start (simulation)
+
+Running simulation is very similar to robot config, it only requires setting `USE_SIM_TIME` to `True` in your `.env` file.  
+
+### 1. Clone this repo on your laptop
+
+```bash
+git clone https://github.com/husarion/rosbot-xl-docker/
+```
+
+### 2. Prepare `demo/.env` file
+
+```bash
+cd rosbot-xl-docker/demo
+cp .env.template .env
+```
+
+And set `USE_SIM_TIME` variable to `True`.
+
+### 3. Create a map
+
+```bash
+docker compose \
+-f compose.rosbot.mapping.yaml \
+-f compose.simulation.nvidia.yaml \
+up
+```
+
+> **Tip no. 5** 💡
+>
+> There is an alternative config `compose.simulation.yaml` to run on all GPUs, but please note that performance is worse, so if you have NVidia GPU, dedicated config is recommended.
+
+Prepare a map with Rviz2 using the **[2D Goal Pose]** button on the top bar.
+
+After you create the map, open a new terminal, navigate to the `demo/` folder and execute:
+
+```bash
+./map-save.sh
+```
+
+Your map has been saved in the docker volume and is available in the `maps/` folder.
+
+The mapping phase is completed, you can stop/remove all running containers.
+
+### 6. Localization on an already created map
+
+```bash
+docker compose \
+-f compose.rosbot.localization.yaml \
+-f compose.simulation.nvidia.yaml \
+up
+```
+
+> **Tip no. 6** 💡
+>
+> As in the previous step, use the `compose.simulation.yaml` config to run on other GPUs.
+
+By using the **[2D Pose Estimate]** button manually tell the ROSbot where on the existing map is its starting position. Then you can use **[2D Goal Pose]** button to navigate ROSbot autonomously.
