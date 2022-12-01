@@ -1,4 +1,4 @@
-FROM osrf/ros:humble-desktop
+FROM husarnet/ros:humble-ros-core
 
 # select bash as default shell
 SHELL ["/bin/bash", "-c"]
@@ -8,22 +8,20 @@ ENV ROSBOT_XL_ROS_BUILD simulation
 
 WORKDIR /ros2_ws
 
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-
-
 # install everything needed
 RUN apt-get update --fix-missing && apt-get install -y \
         python3-pip \
         python3-colcon-common-extensions \
         python3-rosdep \
-        ros-humble-rmw-cyclonedds-cpp \
-        python3-vcstool && \
+        python3-vcstool \
+        git && \
     apt-get upgrade -y && \
     # build & install ROSbot XL packages
     source "/opt/ros/$ROS_DISTRO/setup.bash" && \
     git clone https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src && \
     vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/rosbot_xl/rosbot_xl_simulation.repos && \
+    rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
     colcon build && \
@@ -33,10 +31,13 @@ RUN apt-get update --fix-missing && apt-get install -y \
         python3-pip \
         python3-colcon-common-extensions \
         python3-rosdep \
-        python3-vcstool && \   
+        python3-vcstool \
+        git && \   
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 COPY ./ros_entrypoint.sh /ros_entrypoint.sh
 ENTRYPOINT ["/ros_entrypoint.sh"]
