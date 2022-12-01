@@ -10,7 +10,6 @@ services:
     ipc: host
     volumes:
       - ./dds-config.xml:/dds-config.xml
-      - ./micro_ros_entrypoint.sh:/micro-ros_entrypoint.sh
     environment:
       - FASTRTPS_DEFAULT_PROFILES_FILE=/dds-config.xml
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}

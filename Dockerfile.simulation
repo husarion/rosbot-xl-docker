@@ -38,6 +38,3 @@ RUN apt-get update --fix-missing && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-
-COPY ./ros_entrypoint.sh /ros_entrypoint.sh
-ENTRYPOINT ["/ros_entrypoint.sh"]
