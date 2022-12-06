@@ -15,10 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: Dockerfile.hardware
-            docker_tag: humble
-          - dockerfile: Dockerfile.simulation
-            docker_tag: humble-simulation
+          # - dockerfile: Dockerfile.hardware
+          #   docker_tag: humble
+          # - dockerfile: Dockerfile.simulation
+          #   docker_tag: humble-simulation
+          - dockerfile: Dockerfile.manipulator
+            docker_tag: humble-manipulator
 
     steps:
       - name: Checkout
