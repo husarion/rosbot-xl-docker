@@ -11,9 +11,9 @@ ARG ROSBOT_FW_RELEASE
 
 # official releases are only for intel archs, so we need to build stm32flash from sources
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    build-essential && \
+        git \
+        curl \
+        build-essential && \
     git clone https://github.com/stm32duino/stm32flash.git && \
     cd stm32flash/ && \
     make all
@@ -30,8 +30,10 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /ros2_ws
 
-COPY --from=stm32flash_builder /stm32flash/stm32flash /stm32flash
+COPY --from=stm32flash_builder /stm32flash/stm32flash /usr/bin/stm32flash
 COPY --from=stm32flash_builder /firmware.bin /firmware.bin
+
+COPY flash-firmware.py /
 
 # install everything needed
 RUN apt-get update && apt-get install -y \
@@ -39,8 +41,10 @@ RUN apt-get update && apt-get install -y \
         python3-colcon-common-extensions \
         python3-rosdep \
         python3-vcstool \
+        libusb-1.0 \
         git && \
     apt-get upgrade -y && \
+    pip3 install pyftdi sh && \
     # build & install ROSbot XL packages
     source "/opt/ros/$ROS_DISTRO/setup.bash" && \
     git clone https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src && \
@@ -55,7 +59,6 @@ RUN apt-get update && apt-get install -y \
     # make the image smaller
     export SUDO_FORCE_REMOVE=yes && \
     apt-get remove -y \
-        python3-pip \
         python3-colcon-common-extensions \
         python3-rosdep \
         python3-vcstool \

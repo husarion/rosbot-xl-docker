@@ -18,8 +18,7 @@ Set dip switch no. 3 on ROSbot XL digital board to **"on" state** (`BOOT0` pin t
 Execute in a termianl on your laptop:
 
 ```bash
-docker run --rm -it \
---device /dev/ttyUSB0:/dev/ttyUSB0 \
+docker run --rm -it --privileged \
 husarion/rosbot-xl:humble \
 /stm32flash -w /firmware.bin -b 115200 -v /dev/ttyUSB0
 ```
