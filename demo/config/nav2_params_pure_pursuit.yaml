@@ -72,6 +72,8 @@ controller_server:
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      
+      # Velocity/accelaration limits also have to be adjusted in the velocity smoother
       desired_linear_vel: 0.5
       lookahead_dist: 0.7
       min_lookahead_dist: 0.5
@@ -282,3 +284,16 @@ smoother_server:
 velocity_smoother:
   ros__parameters:
     use_sim_time: False
+
+    smoothing_frequency: 20.0
+    scale_velocities: False
+    feedback: "OPEN_LOOP"
+    max_velocity: [0.5, 0.0, 2.5]
+    min_velocity: [-0.5, 0.0, -2.5]
+    max_accel: [2.5, 0.0, 3.2]
+    max_decel: [-2.5, 0.0, -3.2]
+    # used in the CLOSED_LOOP feedback mode
+    # odom_topic: "odom"
+    # odom_duration: 0.1
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 1.0
