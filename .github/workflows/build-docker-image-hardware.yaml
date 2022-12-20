@@ -2,6 +2,10 @@ name: Docker image for hardware
 
 on:
   push:
+    paths-ignore:
+      - 'README'
+      - 'LICENSE'
+      - 'demo/**'
   workflow_dispatch:
   repository_dispatch:
     types: [ros-package-update]

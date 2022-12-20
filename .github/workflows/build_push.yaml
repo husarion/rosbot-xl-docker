@@ -2,6 +2,10 @@ name: Build a Docker Image
 
 on:
   push:
+    paths-ignore:
+      - 'README'
+      - 'LICENSE'
+      - 'demo/**'
     branches:
       - "main"
   repository_dispatch:
