@@ -11,16 +11,17 @@ Official ROSbot XL docker images built from this repo are available here: https:
 
 ## Flashing the firmware
 
-Connect your laptop to Micro USB port on the ROSbot XL digital board (with STM32F4), check USB port in your OS with a serial connection to the board (in most cases `/dev/ttyUSB0`).
+Connect ROSbot to a Single Board Computer inside ROSbot XL by using a micro-USB cable. Check under which port the board is listed on your OS (in most cases it's `/dev/ttyUSB0`):
 
-Set dip switch no. 3 on ROSbot XL digital board to **"on" state** (`BOOT0` pin to HIGH) and click the `RESET` button, to enter the programming mode.
-
-Execute in a termianl on your laptop:
+```bash
+husarion@husarion:/$ ls -la /dev/ttyUSB*
+crw-rw---- 1 root dialout 188, 0 Dec 20 17:57 /dev/ttyUSB0
+```
 
 ```bash
 docker run --rm -it --privileged \
 husarion/rosbot-xl:humble \
-/stm32flash -w /firmware.bin -b 115200 -v /dev/ttyUSB0
+flash-firmware.py /firmware.bin /dev/ttyUSB0
 ```
 
 Set dip switch no. 3 to **"off" state**  (`BOOT0` pin to LOW) and click the `RESET` button to start a newly flashed firmware.

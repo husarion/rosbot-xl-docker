@@ -8,3 +8,4 @@ docs/
 .gitignore
 Dockerfile.*
 README.md
+LICENSE
