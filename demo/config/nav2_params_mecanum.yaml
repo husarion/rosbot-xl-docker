@@ -71,6 +71,7 @@ controller_server:
 
       debug_trajectory_details: True
 
+      # Velocity/accelaration limits also have to be adjusted in the velocity smoother
       min_vel_x: -0.45
       max_vel_x: 0.45
       acc_lim_x: 1.0
@@ -306,3 +307,16 @@ smoother_server:
 velocity_smoother:
   ros__parameters:
     use_sim_time: False
+
+    smoothing_frequency: 20.0
+    scale_velocities: False
+    feedback: "OPEN_LOOP"
+    max_velocity: [0.45, 0.45, 0.0]
+    min_velocity: [-0.45, -0.45, 0.0]
+    max_accel: [1.0, 1.0, 0.0]
+    max_decel: [-1.0, -1.0, 0.0]
+    # used in the CLOSED_LOOP feedback mode
+    # odom_topic: "odom"
+    # odom_duration: 0.1
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 1.0
