@@ -3,7 +3,7 @@
 from pyftdi.ftdi import Ftdi
 from pyftdi.eeprom import FtdiEeprom
 
-device = 'ftdi://ftdi:ft-x:DK0AM0V0/1'
+device = 'ftdi://ftdi:ft-x:/1'
 
 ftdi = Ftdi()
 ftdi.open_from_url(url=device)
