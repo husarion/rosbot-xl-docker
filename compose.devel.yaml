@@ -1,0 +1,11 @@
+services:
+  rosbot_xl:
+    build:
+      context: ./
+      dockerfile: Dockerfile.hardware
+    privileged: true
+    volumes:
+      - type: bind
+        source: ./
+        target: /my-volume
+    command: sleep 9000

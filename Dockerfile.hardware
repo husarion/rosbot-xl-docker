@@ -4,21 +4,27 @@ ARG ROSBOT_FW_RELEASE=v0.0.4
 ## ============================ STM32FLASH =================================
 # stm32flash needs an older version of glibc (2.28), which is why ubuntu 18.04 was used
 # official releases are only for intel archs, so we need to build stm32flash from sources
-FROM ubuntu:20.04 AS stm32flash_builder
-
-ARG ROS_DISTRO
-ARG ROSBOT_FW_RELEASE
+FROM ubuntu:18.04 AS stm32flash_builder
 
 # official releases are only for intel archs, so we need to build stm32flash from sources
 RUN apt-get update && apt-get install -y \
         git \
-        curl \
-        python3 \
-        python3-pip \
         build-essential && \
     git clone https://github.com/stm32duino/stm32flash.git && \
     cd stm32flash/ && \
     make all
+
+## =========================== Firmware ================================
+
+FROM ubuntu:20.04 AS stm32_firmware
+
+ARG ROSBOT_FW_RELEASE
+
+# official releases are only for intel archs, so we need to build stm32flash from sources
+RUN apt-get update && apt-get install -y \
+        curl \
+        python3 \
+        python3-pip
 
 RUN echo ros_distro=$ROS_DISTRO firmware_release=$ROSBOT_FW_RELEASE
 
@@ -32,9 +38,6 @@ RUN pip3 install -U platformio && \
     cd /read_cpu_id && \
     pio run && \
     chmod -x .pio/build/olimex_e407/firmware.bin
-
-RUN ls -la /read_cpu_id/.pio/build/olimex_e407
-
 
 ## =========================== ROS image ===============================
 FROM husarnet/ros:$ROS_DISTRO-ros-core
@@ -79,8 +82,9 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=stm32flash_builder /stm32flash/stm32flash /usr/bin/
-COPY --from=stm32flash_builder /firmware.bin /firmware.bin
-COPY --from=stm32flash_builder /read_cpu_id/.pio/build/olimex_e407/firmware.bin /firmware_read_cpu_id.bin
+COPY --from=stm32_firmware /firmware.bin /firmware.bin
+COPY --from=stm32_firmware /read_cpu_id/.pio/build/olimex_e407/firmware.bin /firmware_read_cpu_id.bin
 
 COPY flash-firmware.py /usr/bin/
 COPY ftdi-eeprom-conf.py /usr/bin/
+COPY print_serial_number.py /usr/bin/

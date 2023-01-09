@@ -9,3 +9,4 @@ docs/
 Dockerfile.*
 README.md
 LICENSE
+compose.*
