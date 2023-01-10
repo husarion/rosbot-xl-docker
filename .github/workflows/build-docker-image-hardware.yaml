@@ -20,7 +20,7 @@ jobs:
       matrix:
         include:
           - ros-distro: humble
-            rosbot-fw-release: "v0.0.3"
+            rosbot-fw-release: "v0.0.4"
             platforms: "linux/amd64, linux/arm64"
 
     steps:
