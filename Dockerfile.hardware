@@ -92,4 +92,4 @@ COPY --from=stm32_firmware /read_cpu_id/.pio/build/olimex_e407/firmware.bin /fir
 
 COPY flash-firmware.py /usr/bin/
 COPY ftdi-eeprom-conf.py /usr/bin/
-COPY print_serial_number.py /usr/bin/
+COPY print-serial-number.py /usr/bin/
