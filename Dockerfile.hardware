@@ -19,7 +19,7 @@ RUN git clone https://github.com/stm32duino/stm32flash.git && \
 
 ## =========================== Firmware ================================
 
-FROM ubuntu:20.04 AS stm32_firmware
+FROM --platform=linux/amd64 ubuntu:20.04 AS stm32_firmware
 
 ARG ROSBOT_FW_RELEASE
 
