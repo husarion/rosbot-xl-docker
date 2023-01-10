@@ -64,12 +64,14 @@ def main():
         description='Flashing the firmware on STM32 microcontroller in ROSbot XL')
 
     parser.add_argument(
-        "file",
+        "-f",
+        "--file",
         nargs='?',
         default="/firmware.bin",
         help="Path to a firmware file. Default: /firmware.bin")
     parser.add_argument(
-        "port",
+        "-p",
+        "--port",
         nargs='?',
         default="/dev/ttyUSB0",
         help="Path to serial connection. Default: /dev/ttyUSB0")

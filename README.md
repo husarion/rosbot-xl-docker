@@ -21,7 +21,7 @@ crw-rw---- 1 root dialout 188, 0 Dec 20 17:57 /dev/ttyUSB0
 ```bash
 docker run --rm -it --privileged \
 husarion/rosbot-xl:humble \
-flash-firmware.py /firmware.bin /dev/ttyUSB0
+flash-firmware.py -p /dev/ttyUSB0
 ```
 
 Set dip switch no. 3 to **"off" state**  (`BOOT0` pin to LOW) and click the `RESET` button to start a newly flashed firmware.
