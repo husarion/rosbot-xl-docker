@@ -50,7 +50,7 @@ class SerialNumberGenerator:
 
     def generate(self):
         print('flash the firmware that prints STM32 unique ID')
-        sh.python3('/usr/bin/flash-firmware.py', self.binary_file, self.port)
+        sh.python3('/usr/bin/flash-firmware.py', f=self.binary_file, p=self.port)
         print('done')
         print('')
 
