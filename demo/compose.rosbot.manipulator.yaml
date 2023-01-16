@@ -1,0 +1,25 @@
+# Quick Star
+# $ docker compose -f compose.rosbot.manipulator.yaml up
+
+services:
+  microros:
+    image: husarion/micro-ros-agent:humble
+    restart: unless-stopped
+    command: ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
+    network_mode: host
+    ipc: host
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+
+  rosbot-xl:
+    image: husarion/rosbot-xl:humble-manipulator
+    restart: unless-stopped
+    command: ros2 launch rosbot_xl_bringup bringup.launch.py mecanum:=${MECANUM:-False}
+    devices:
+      - /dev/manipulator:/dev/ttyUSB0
+    network_mode: host
+    ipc: host
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}

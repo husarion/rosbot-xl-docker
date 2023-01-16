@@ -1,0 +1,56 @@
+# Quick Star
+# $ docker compose -f compose.rosbot.manipulator.yaml up
+
+services:
+#   microros:
+#     image: husarion/micro-ros-agent:humble
+#     restart: unless-stopped
+#     command: ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
+#     healthcheck:
+#       test: "if [ $$(. /opt/ros/$$ROS_DISTRO/setup.sh ; ros2 topic info /_motors_response | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+#       interval: 1s
+#       timeout: 5s
+#       retries: 50
+
+  # rplidar:
+  #   image: husarion/rplidar:humble
+  #   restart: unless-stopped
+  #   devices:
+  #     - /dev/rplidar
+  #   volumes:
+  #     - ./config/sllidar_launch.py:/sllidar_launch.py
+  #   command: ros2 launch /sllidar_launch.py serial_baudrate:=${RPLIDAR_BAUDRATE:-256000} serial_port:=/dev/rplidar scan_mode:=Standard
+  #   healthcheck:
+  #     test: "if [ $$(. /opt/ros/$$ROS_DISTRO/setup.sh ; ros2 topic info /scan | grep 'Publisher count: 1' | wc -l) -eq 0 ]; then exit 1; else exit 0; fi"
+  #     interval: 1s
+  #     timeout: 5s
+  #     retries: 50
+
+  microros:
+    image: husarion/micro-ros-agent:humble
+    restart: unless-stopped
+    command: ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888
+    network_mode: host
+    ipc: host
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+
+  rosbot-xl:
+    # image: husarion/rosbot-xl:humble-manipulator
+    image: rosbotxl-manipulator
+    restart: unless-stopped
+    # command: ros2 launch rosbot_xl_bringup bringup.launch.py mecanum:=${MECANUM:-False}
+    devices:
+      - /dev/manipulator:/dev/ttyUSB0
+    volumes:
+      - /home/husarion/ros2_ws:/ros2_ws
+      # - ./config/rosbot_xl.srdf:/ros2_ws/install/open_manipulator_x_rosbot_xl_moveit/share/open_manipulator_x_rosbot_xl_moveit/config/rosbot_xl.srdf
+    network_mode: host
+    ipc: host
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+    entrypoint: /bin/bash
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - RMW_IMPLEMENTATION=${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
