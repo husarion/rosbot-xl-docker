@@ -23,8 +23,10 @@ jobs:
           #   docker_tag: humble
           # - dockerfile: Dockerfile.simulation
           #   docker_tag: humble-simulation
-          - dockerfile: Dockerfile.manipulator
-            docker_tag: humble-manipulator
+          - dockerfile: Dockerfile.manipulation.simulation
+            docker_tag: humble-manipulation-simulation
+          - dockerfile: Dockerfile.manipulation.hardware
+            docker_tag: humble-manipulation
 
     steps:
       - name: Checkout

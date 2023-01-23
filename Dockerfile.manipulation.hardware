@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y \
     pip3 install pyftdi sh && \
     # build & install ROSbot XL packages
     source "/opt/ros/$ROS_DISTRO/setup.bash" && \
-    git clone https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src -b open_manipulator_x && \
+    git clone --branch open_manipulator_x https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src && \
     vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/open_manipulator_x/open_manipulator_x.repos && \
     # it is necessary to remove simulation - otherwise rosdep tries to install dependencies
