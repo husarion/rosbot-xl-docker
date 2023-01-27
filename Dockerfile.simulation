@@ -39,4 +39,4 @@ RUN apt-get update --fix-missing && apt-get install -y \
 
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
-RUN echo $(cat /ros2_ws/src/rosbot_xl_ros/rosbot_xl_gazebo/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt
+RUN echo $(cat /ros2_ws/src/rosbot_xl_gazebo/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt
