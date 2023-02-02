@@ -38,7 +38,15 @@ jobs:
       matrix:
 
         include:
+          - dockerfile: Dockerfile.hardware
+            platforms: "linux/amd64, linux/arm64"
+            ros_distro: "humble"
+          - dockerfile: Dockerfile.simulation
+            repo_name: "rosbot-xl-gazebo"
+            platforms: "linux/amd64"
+            ros_distro: "humble"
           - dockerfile: Dockerfile.manipulation.hardware
+            repo_name: "rosbot-xl-manipulation"
             platforms: "linux/amd64, linux/arm64"
             ros_distro: "humble"
           - dockerfile: Dockerfile.manipulation.simulation
