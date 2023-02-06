@@ -95,3 +95,5 @@ COPY --from=stm32_firmware /read_cpu_id/.pio/build/olimex_e407/firmware.bin /fir
 COPY flash-firmware.py /usr/bin/
 COPY ftdi-eeprom-conf.py /usr/bin/
 COPY print-serial-number.py /usr/bin/
+
+RUN echo $(cat /ros2_ws/src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt
