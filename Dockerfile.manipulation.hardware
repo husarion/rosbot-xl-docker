@@ -71,7 +71,8 @@ RUN apt-get update && apt-get install -y \
     vcs import src < src/rosbot_xl_ros/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/open_manipulator_x/open_manipulator_x.repos && \
     # it is necessary to remove simulation - otherwise rosdep tries to install dependencies
-    rm -r src/rosbot_xl_gazebo && \
+    rm -r src/rosbot_xl_ros/rosbot_xl_gazebo && \
+    rm -r src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation_gazebo && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
