@@ -7,7 +7,7 @@ Docker images for ROSbot XL
 Official ROSbot XL docker images built from this repo are available here: https://hub.docker.com/r/husarion/rosbot-xl/tags
 
 - `husarion/rosbot-xl:humble` - the image for a real (physical) robot
-<!-- - `husarion/rosbot-xl:humble-simulation` - the image with built-in Gazebo simulation model -->
+- `husarion/rosbot-xl-gazebo:humble` - the image with Gazebo simulation model
 
 ## Flashing the firmware
 
@@ -36,13 +36,16 @@ docker buildx build \
 .
 ```
 
-
 ## ROS API
 
 Available in [rosbot_xl_ros/ROS_API.md](https://github.com/husarion/rosbot_xl_ros/blob/master/ROS_API.md)
 
-## Autonomous Navigation Demo
+## How to use `rosbot-xl` Docker image?
 
-In a [/demo](/demo) folder your will find an example of how to use ROSbot docker image in a real autonomous navigation use case.
+Find available projects below:
 
-<!-- ![](demo/.docs/rviz_mapping.png) -->
+| link | description |
+| - | - |
+| [rosbot-xl-mapping](https://github.com/husarion/rosbot-xl-mapping) | Create a map (using [slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)) of the unknow environment with ROSbot XL controlled in LAN or over the Internet |
+| [rosbot-xl-navigation](https://github.com/husarion/rosbot-xl-navigation) | Autonomous navigation (using [navigation2](https://github.com/ros-planning/navigation2)) on a given map.  |
+
