@@ -58,6 +58,8 @@ WORKDIR /ros2_ws
 ENV MYDISTRO=${PREFIX:-ros}
 RUN if [[ "$PREFIX" == "vulcanexus-" ]]; then export MYDISTRO="vulcanexus"; fi
 
+RUN echo $MYDISTRO
+
 # install everything needed
 RUN apt-get update && apt-get install -y \
         python3-pip \

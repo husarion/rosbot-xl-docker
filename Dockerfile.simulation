@@ -14,7 +14,7 @@ ENV ROSBOT_XL_ROS_BUILD simulation
 WORKDIR /ros2_ws
 
 ENV MYDISTRO=${PREFIX:-ros}
-RUN [[ "$PREFIX" = "vulcanexus-" ]] && export MYDISTRO="vulcanexus"
+RUN if [[ "$PREFIX" == "vulcanexus-" ]]; then export MYDISTRO="vulcanexus"; fi
 
 # install everything needed
 RUN apt-get update --fix-missing && apt-get install -y \
