@@ -14,7 +14,9 @@ ENV ROSBOT_XL_ROS_BUILD simulation
 WORKDIR /ros2_ws
 
 # install everything needed
-RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
+RUN export MYDISTRO=${PREFIX:-ros} && \
+    export MYDISTRO=${MYDISTRO//-/} && \
+    echo $MYDISTRO && \
     apt-get update --fix-missing && apt-get install -y \
         python3-pip \
         python3-colcon-common-extensions \

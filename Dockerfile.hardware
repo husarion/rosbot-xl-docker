@@ -56,7 +56,9 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR /ros2_ws
 
 # install everything needed
-RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
+RUN export MYDISTRO=${PREFIX:-ros} && \
+    export MYDISTRO=${MYDISTRO//-/} && \
+    echo $MYDISTRO && \
     apt-get update && apt-get install -y \
         python3-pip \
         python3-colcon-common-extensions \
