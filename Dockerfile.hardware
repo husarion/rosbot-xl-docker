@@ -55,9 +55,6 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /ros2_ws
 
-RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
-    echo $MYDISTRO
-
 # install everything needed
 RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     echo $MYDISTRO && \
@@ -78,6 +75,8 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
     # it is necessary to remove simulation - otherwise rosdep tries to install dependencies
     rm -r src/rosbot_xl_gazebo && \
+    # without this line rosdep init throws error: "ERROR: default sources list file already exists:"
+    rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
