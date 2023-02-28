@@ -57,7 +57,6 @@ WORKDIR /ros2_ws
 
 # install everything needed
 RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
-    echo $MYDISTRO && \
     apt-get update && apt-get install -y \
         python3-pip \
         python3-colcon-common-extensions \
@@ -75,7 +74,7 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
     # it is necessary to remove simulation - otherwise rosdep tries to install dependencies
     rm -r src/rosbot_xl_gazebo && \
-    # without this line rosdep init throws error: "ERROR: default sources list file already exists:"
+    # without this line (using vulcanexus base image) rosdep init throws error: "ERROR: default sources list file already exists:"
     rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
