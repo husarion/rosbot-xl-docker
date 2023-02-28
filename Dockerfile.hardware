@@ -48,6 +48,8 @@ RUN pip3 install -U platformio && \
 ## =========================== ROS image ===============================
 FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
 
+ARG PREFIX
+
 # select bash as default shell
 SHELL ["/bin/bash", "-c"]
 

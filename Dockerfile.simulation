@@ -3,6 +3,8 @@ ARG PREFIX=
 
 FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
 
+ARG PREFIX
+
 # select bash as default shell
 SHELL ["/bin/bash", "-c"]
 
