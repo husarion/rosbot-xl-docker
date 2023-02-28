@@ -55,10 +55,11 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /ros2_ws
 
+# Set the value of $MYDISTRO to the value of $PREFIX with a default of "ros" if $PREFIX is empty.
 ENV MYDISTRO=${PREFIX:-ros}
-RUN if [[ "$PREFIX" == "vulcanexus-" ]]; then export MYDISTRO="vulcanexus"; fi
 
-RUN echo $MYDISTRO
+# Remove the trailing "-" character from the value of $MYDISTRO, if it exists.
+ENV MYDISTRO=${MYDISTRO%-}
 
 # install everything needed
 RUN apt-get update && apt-get install -y \

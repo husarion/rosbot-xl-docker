@@ -13,8 +13,11 @@ ENV ROSBOT_XL_ROS_BUILD simulation
 
 WORKDIR /ros2_ws
 
+# Set the value of $MYDISTRO to the value of $PREFIX with a default of "ros" if $PREFIX is empty.
 ENV MYDISTRO=${PREFIX:-ros}
-RUN if [[ "$PREFIX" == "vulcanexus-" ]]; then export MYDISTRO="vulcanexus"; fi
+
+# Remove the trailing "-" character from the value of $MYDISTRO, if it exists.
+ENV MYDISTRO=${MYDISTRO%-}
 
 # install everything needed
 RUN apt-get update --fix-missing && apt-get install -y \
