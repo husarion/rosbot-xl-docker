@@ -1,4 +1,7 @@
-FROM husarnet/ros:humble-ros-core
+ARG ROS_DISTRO=humble
+ARG PREFIX=
+
+FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
 
 # select bash as default shell
 SHELL ["/bin/bash", "-c"]
@@ -7,6 +10,9 @@ ENV IGNITION_VERSION fortress
 ENV ROSBOT_XL_ROS_BUILD simulation
 
 WORKDIR /ros2_ws
+
+ENV MYDISTRO=${PREFIX:-ros}
+RUN [[ "$PREFIX" = "vulcanexus-" ]] && export MYDISTRO="vulcanexus"
 
 # install everything needed
 RUN apt-get update --fix-missing && apt-get install -y \
@@ -17,7 +23,7 @@ RUN apt-get update --fix-missing && apt-get install -y \
         git && \
     apt-get upgrade -y && \
     # build & install ROSbot XL packages
-    source "/opt/ros/$ROS_DISTRO/setup.bash" && \
+    source "/opt/$MYDISTRO/$ROS_DISTRO/setup.bash" && \
     git clone https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src && \
     vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/rosbot_xl/rosbot_xl_simulation.repos && \
@@ -36,7 +42,5 @@ RUN apt-get update --fix-missing && apt-get install -y \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 RUN echo $(cat /ros2_ws/src/rosbot_xl_gazebo/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt
