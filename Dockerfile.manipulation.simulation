@@ -4,7 +4,7 @@ FROM husarnet/ros:humble-ros-core
 SHELL ["/bin/bash", "-c"]
 
 ENV IGNITION_VERSION fortress
-ENV ROSBOT_XL_ROS_BUILD simulation
+ENV HUSARION_ROS_BUILD simulation
 
 WORKDIR /ros2_ws
 
