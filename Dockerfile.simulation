@@ -20,6 +20,7 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
         python3-colcon-common-extensions \
         python3-rosdep \
         python3-vcstool \
+        ros-$ROS_DISTRO-teleop-twist-keyboard \
         git && \
     apt-get upgrade -y && \
     # build & install ROSbot XL packages
