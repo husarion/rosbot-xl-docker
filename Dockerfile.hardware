@@ -65,6 +65,7 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
         libusb-1.0 \
         usbutils \
         screen \
+        ros-$ROS_DISTRO-teleop-twist-keyboard \
         git && \
     apt-get upgrade -y && \
     pip3 install pyftdi sh && \
