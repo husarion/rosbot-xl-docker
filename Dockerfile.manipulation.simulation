@@ -1,7 +1,7 @@
-FROM husarnet/ros:humble-ros-core
+ARG ROS_DISTRO=humble
 
-# select bash as default shell
-SHELL ["/bin/bash", "-c"]
+FROM husarion/rosbot-xl-gazebo:$ROS_DISTRO
+
 
 ENV IGNITION_VERSION fortress
 ENV HUSARION_ROS_BUILD simulation
@@ -17,7 +17,7 @@ RUN apt-get update --fix-missing && apt-get install -y \
         git && \
     apt-get upgrade -y && \
     # build & install ROSbot XL packages
-    source "/opt/ros/$ROS_DISTRO/setup.bash" && \
+    source "/ros2_ws/install/setup.bash" && \
     git clone https://github.com/husarion/rosbot_xl_manipulation_ros.git /ros2_ws/src/rosbot_xl_manipulation_ros && \
     vcs import src < src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/rosbot_xl_manipulation.repos && \
     vcs import src < src/rosbot_xl_ros/rosbot_xl/rosbot_xl_hardware.repos && \
