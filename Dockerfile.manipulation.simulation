@@ -2,7 +2,6 @@ ARG ROS_DISTRO=humble
 
 FROM husarion/rosbot-xl-gazebo:$ROS_DISTRO
 
-
 ENV IGNITION_VERSION fortress
 ENV HUSARION_ROS_BUILD simulation
 
@@ -16,13 +15,15 @@ RUN apt-get update --fix-missing && apt-get install -y \
         python3-vcstool \
         git && \
     apt-get upgrade -y && \
+    rm -rf /ros2_ws/* && \
     # build & install ROSbot XL packages
-    source "/ros2_ws/install/setup.bash" && \
+    source "/opt/ros/$ROS_DISTRO/setup.bash" && \
     git clone https://github.com/husarion/rosbot_xl_manipulation_ros.git /ros2_ws/src/rosbot_xl_manipulation_ros && \
     vcs import src < src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/rosbot_xl_manipulation.repos && \
     vcs import src < src/rosbot_xl_ros/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/rosbot_xl_ros/rosbot_xl/rosbot_xl_simulation.repos && \
     vcs import src < src/open_manipulator_x/open_manipulator_x.repos && \
+    rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
