@@ -1,4 +1,4 @@
-name: Build/Publish ROS Docker Image 
+name: Build/Publish ROS Docker Image (OpenManipulator-X)
 
 on: 
   workflow_dispatch:
