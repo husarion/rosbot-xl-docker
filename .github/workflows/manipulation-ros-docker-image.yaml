@@ -24,11 +24,7 @@ on:
         type: string
         default: "20131206"
   repository_dispatch:
-    types: [rebuild]
-  pull_request:
-    types:
-      - closed
-      - opened
+    types: [rebuild-manipulation]
 
 jobs:
   build:
@@ -36,13 +32,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-
         include:
-          - dockerfile: Dockerfile.hardware
+          - dockerfile: Dockerfile.manipulation.hardware
+            repo_name: "rosbot-xl-manipulation"
             platforms: "linux/amd64, linux/arm64"
             ros_distro: "humble"
-          - dockerfile: Dockerfile.simulation
-            repo_name: "rosbot-xl-gazebo"
+          - dockerfile: Dockerfile.manipulation.simulation
+            repo_name: "rosbot-xl-manipulation-gazebo"
             platforms: "linux/amd64"
             ros_distro: "humble"
 
