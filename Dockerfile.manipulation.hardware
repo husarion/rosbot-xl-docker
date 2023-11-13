@@ -56,5 +56,5 @@ RUN apt-get update && apt-get install -y \
 
 RUN echo $(cat /ros2_ws/src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=5 \
+HEALTHCHECK --interval=15s --timeout=10s --start-period=5s --retries=5 \
     CMD bash -c "/ros_entrypoint.sh ros2 run healthcheck_pkg healthcheck_node"
