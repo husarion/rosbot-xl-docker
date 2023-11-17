@@ -18,12 +18,10 @@ void write_health_status(const std::string &status) {
 }
 
 void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-  std::cout << "Message received" << std::endl;
   last_odom_msg_time = std::chrono::steady_clock::now();
 }
 
 void joint_callback(const control_msgs::msg::DynamicJointState::SharedPtr msg) {
-  std::cout << "Joint message received: ";
 
   std::vector<std::string> expected_joint_names = {
       "fl_wheel_joint",
@@ -41,12 +39,10 @@ void joint_callback(const control_msgs::msg::DynamicJointState::SharedPtr msg) {
   for (const auto &joint_name : msg->joint_names) {
     if (std::find(expected_joint_names.begin(), expected_joint_names.end(),
                   joint_name) == expected_joint_names.end()) {
-      std::cout << "Joints are different than expected" << std::endl;
       return;
     }
   }
 
-  std::cout << "Joints are correct" << std::endl;
   last_odom_msg_time = std::chrono::steady_clock::now();
 }
 
@@ -61,10 +57,8 @@ void healthy_check(const rclcpp::Node::SharedPtr &node) {
   bool are_joints_valid = odom_elapsed_time.count() < MSG_VALID_TIME.count();
 
   if (is_odom_valid && are_joints_valid) {
-    std::cout << "Health check: healthy" << std::endl;
     write_health_status("healthy");
   } else {
-    std::cout << "Health check: unhealthy" << std::endl;
     write_health_status("unhealthy");
   }
 }
