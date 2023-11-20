@@ -46,7 +46,7 @@ void joint_callback(const control_msgs::msg::DynamicJointState::SharedPtr msg) {
   last_odom_msg_time = std::chrono::steady_clock::now();
 }
 
-void healthy_check(const rclcpp::Node::SharedPtr &node) {
+void healthy_check() {
   std::chrono::steady_clock::time_point current_time =
       std::chrono::steady_clock::now();
   std::chrono::duration<double> odom_elapsed_time =
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
   while (rclcpp::ok()) {
     rclcpp::spin_some(node);
-    healthy_check(node);
+    healthy_check();
     std::this_thread::sleep_for(LOOP_PERIOD);
   }
 
