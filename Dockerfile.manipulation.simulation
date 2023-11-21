@@ -33,12 +33,10 @@ RUN apt-get update --fix-missing && apt-get install -y \
     cd src/ && \
     # Does not build
     rm -rf DynamixelSDK/dynamixel_sdk_examples && \
-    ros2 pkg create healthcheck_pkg --build-type ament_cmake --dependencies rclcpp std_msgs && \
-    sed -i '/find_package(std_msgs REQUIRED)/a \
-            find_package(control_msgs REQUIRED)\n \
-            find_package(nav_msgs REQUIRED)\n \
+    ros2 pkg create healthcheck_pkg --build-type ament_cmake --dependencies rclcpp control_msgs nav_msgs && \
+    sed -i '/find_package(nav_msgs REQUIRED)/a \
             add_executable(healthcheck_node src/healthcheck_manipulation.cpp)\n \
-            ament_target_dependencies(healthcheck_node rclcpp std_msgs control_msgs nav_msgs)\n \
+            ament_target_dependencies(healthcheck_node rclcpp control_msgs nav_msgs)\n \
             install(TARGETS healthcheck_node DESTINATION lib/${PROJECT_NAME})' \
             /ros2_ws/src/healthcheck_pkg/CMakeLists.txt && \
     mv /healthcheck_manipulation.cpp /ros2_ws/src/healthcheck_pkg/src/ && \

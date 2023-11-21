@@ -10,7 +10,7 @@ using namespace std::chrono_literals;
 #define MSG_VALID_TIME 5s
 
 std::chrono::steady_clock::time_point last_odom_msg_time;
-std::chrono::steady_clock::time_point last_join_msg_time;
+std::chrono::steady_clock::time_point last_joint_msg_time;
 
 void write_health_status(const std::string &status) {
   std::ofstream healthFile("/health_status.txt");
@@ -51,10 +51,10 @@ void healthy_check() {
       std::chrono::steady_clock::now();
   std::chrono::duration<double> odom_elapsed_time =
       current_time - last_odom_msg_time;
-  std::chrono::duration<double> joints_elapsed_time =
-      current_time - last_odom_msg_time;
+  std::chrono::duration<double> joint_elapsed_time =
+      current_time - last_joint_msg_time;
   bool is_odom_valid = odom_elapsed_time.count() < MSG_VALID_TIME.count();
-  bool are_joints_valid = odom_elapsed_time.count() < MSG_VALID_TIME.count();
+  bool are_joints_valid = joint_elapsed_time.count() < MSG_VALID_TIME.count();
 
   if (is_odom_valid && are_joints_valid) {
     write_health_status("healthy");
