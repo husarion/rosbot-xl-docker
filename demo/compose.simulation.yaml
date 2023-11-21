@@ -26,4 +26,3 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev
     command: ros2 launch rosbot_xl_gazebo simulation.launch.py mecanum:=${MECANUM:-False}
-_
