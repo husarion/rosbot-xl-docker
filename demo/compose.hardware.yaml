@@ -13,4 +13,6 @@ services:
   rosbot_xl:
     image: husarion/rosbot-xl:humble
     <<: *net-config
+    volumes:
+    - ./lan-cyclonedds.xml:/lan-cyclonedds.xml
     command: ros2 launch rosbot_xl_bringup bringup.launch.py mecanum:=${MECANUM:-False}
