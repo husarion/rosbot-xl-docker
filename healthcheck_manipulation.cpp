@@ -13,7 +13,7 @@ std::chrono::steady_clock::time_point last_odom_msg_time;
 std::chrono::steady_clock::time_point last_joint_msg_time;
 
 void write_health_status(const std::string &status) {
-  std::ofstream healthFile("/health_status.txt");
+  std::ofstream healthFile("/var/tmp/health_status.txt");
   healthFile << status;
 }
 
