@@ -43,7 +43,7 @@ void joint_callback(const control_msgs::msg::DynamicJointState::SharedPtr msg) {
     }
   }
 
-  last_odom_msg_time = std::chrono::steady_clock::now();
+  last_joint_msg_time = std::chrono::steady_clock::now();
 }
 
 void healthy_check() {
@@ -65,7 +65,7 @@ void healthy_check() {
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-  auto node = rclcpp::Node::make_shared("healthcheck_node");
+  auto node = rclcpp::Node::make_shared("healthcheck_manipulation");
   auto odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
       "odometry/filtered", rclcpp::SensorDataQoS(), odom_callback);
   auto joint_sub =
