@@ -2,7 +2,8 @@ x-net-config:
   &net-config
   network_mode: host
   ipc: host
-  env_file: net.env
+  environment:
+    - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 x-gpu-config:
   &gpu-config
@@ -25,4 +26,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev
-    command: ros2 launch rosbot_xl_gazebo simulation.launch.py mecanum:=${MECANUM:-False}
+    command: >
+      ros2 launch rosbot_xl_gazebo simulation.launch.py
+      mecanum:=${MECANUM:-False}
+      camera_model:=intel_realsense_d435
