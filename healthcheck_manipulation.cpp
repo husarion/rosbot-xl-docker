@@ -67,10 +67,10 @@ int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("healthcheck_manipulation");
   auto odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
-      "odometry/filtered", rclcpp::SensorDataQoS(), odom_callback);
+      "odometry/filtered", rclcpp::SensorDataQoS().keep_last(1), odom_callback);
   auto joint_sub =
       node->create_subscription<control_msgs::msg::DynamicJointState>(
-          "dynamic_joint_states", rclcpp::SystemDefaultsQoS(), joint_callback);
+          "dynamic_joint_states", rclcpp::SystemDefaultsQoS().keep_last(1), joint_callback);
 
   while (rclcpp::ok()) {
     rclcpp::spin_some(node);
