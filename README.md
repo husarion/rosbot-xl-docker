@@ -46,6 +46,5 @@ Find available projects below:
 
 | link | description |
 | - | - |
-| [rosbot-xl-mapping](https://github.com/husarion/rosbot-xl-mapping) | Create a map (using [slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)) of the unknow environment with ROSbot XL controlled in LAN or over the Internet |
+| [rosbot-xl-mapping](https://github.com/husarion/rosbot-xl-mapping) | Create a map (using [slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)) of the unknown environment with ROSbot XL controlled in LAN or over the Internet |
 | [rosbot-xl-navigation](https://github.com/husarion/rosbot-xl-navigation) | Autonomous navigation (using [navigation2](https://github.com/ros-planning/navigation2)) on a given map.  |
-
