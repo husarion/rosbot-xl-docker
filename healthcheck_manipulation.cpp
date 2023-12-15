@@ -65,7 +65,7 @@ void healthy_check() {
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-  auto node = rclcpp::Node::make_shared("healthcheck_manipulation");
+  auto node = rclcpp::Node::make_shared("healthcheck_roxbot_xl");
   auto odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
       "odometry/filtered", rclcpp::SensorDataQoS().keep_last(1), odom_callback);
   auto joint_sub =
