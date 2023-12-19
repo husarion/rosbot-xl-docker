@@ -6,8 +6,8 @@
 
 using namespace std::chrono_literals;
 
-#define LOOP_PERIOD 2s
-#define MSG_VALID_TIME 5s
+#define LOOP_PERIOD 500ms
+#define MSG_VALID_TIME 2s
 
 std::chrono::steady_clock::time_point last_odom_msg_time;
 std::chrono::steady_clock::time_point last_joint_msg_time;
@@ -53,8 +53,8 @@ void healthy_check() {
       current_time - last_odom_msg_time;
   std::chrono::duration<double> joint_elapsed_time =
       current_time - last_joint_msg_time;
-  bool is_odom_valid = odom_elapsed_time.count() < MSG_VALID_TIME.count();
-  bool are_joints_valid = joint_elapsed_time.count() < MSG_VALID_TIME.count();
+  bool is_odom_valid = odom_elapsed_time < MSG_VALID_TIME;
+  bool are_joints_valid = joint_elapsed_time < MSG_VALID_TIME;
 
   if (is_odom_valid && are_joints_valid) {
     write_health_status("healthy");
@@ -65,7 +65,7 @@ void healthy_check() {
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-  auto node = rclcpp::Node::make_shared("healthcheck_manipulation");
+  auto node = rclcpp::Node::make_shared("healthcheck_rosbot_xl");
   auto odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
       "odometry/filtered", rclcpp::SensorDataQoS().keep_last(1), odom_callback);
   auto joint_sub =
