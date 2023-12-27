@@ -70,7 +70,8 @@ int main(int argc, char *argv[]) {
       "odometry/filtered", rclcpp::SensorDataQoS().keep_last(1), odom_callback);
   auto joint_sub =
       node->create_subscription<control_msgs::msg::DynamicJointState>(
-          "dynamic_joint_states", rclcpp::SystemDefaultsQoS().keep_last(1), joint_callback);
+          "dynamic_joint_states", rclcpp::SystemDefaultsQoS().keep_last(1),
+          joint_callback);
 
   while (rclcpp::ok()) {
     rclcpp::spin_some(node);
