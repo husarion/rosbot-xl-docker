@@ -4,12 +4,14 @@ FROM husarion/rosbot-xl:$ROS_DISTRO
 
 WORKDIR /ros2_ws
 
+COPY ./healthcheck_manipulation.cpp /
+
 # install everything needed
 RUN apt-get update && apt-get install -y \
         python3-colcon-common-extensions \
         python3-rosdep \
         python3-vcstool \
-        git && \ 
+        git && \
     apt-get upgrade -y && \
     rm -rf /ros2_ws/* && \
     # build & install ROSbot XL packages
@@ -25,16 +27,40 @@ RUN apt-get update && apt-get install -y \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
-    colcon build && \
-    # make the image smaller
+    # Create healthcheck package
+    cd src/ && \
+    # Does not build
+    rm -rf DynamixelSDK/dynamixel_sdk_examples && \
+    ros2 pkg create healthcheck_pkg --build-type ament_cmake --dependencies rclcpp control_msgs nav_msgs && \
+    sed -i '/find_package(nav_msgs REQUIRED)/a \
+            add_executable(healthcheck_node src/healthcheck_manipulation.cpp)\n \
+            ament_target_dependencies(healthcheck_node rclcpp control_msgs nav_msgs)\n \
+            install(TARGETS healthcheck_node DESTINATION lib/${PROJECT_NAME})' \
+            /ros2_ws/src/healthcheck_pkg/CMakeLists.txt && \
+    mv /healthcheck_manipulation.cpp /ros2_ws/src/healthcheck_pkg/src/ && \
+    cd .. && \
+    # Build
+    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
+    # Save version
+    echo $(cat /ros2_ws/src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt && \
+    # Size optimalization
+    rm -rf build log src && \
     export SUDO_FORCE_REMOVE=yes && \
     apt-get remove -y \
         python3-colcon-common-extensions \
         python3-rosdep \
         python3-vcstool \
-        git && \       
+        git && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN echo $(cat /ros2_ws/src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt
+# Run healthcheck in background
+RUN entrypoint_file=$(if [ -f "/ros_entrypoint.sh" ]; then echo "/ros_entrypoint.sh"; else echo "/vulcanexus_entrypoint.sh"; fi) && \
+    sed -i '/test -f "\/ros2_ws\/install\/setup.bash" && source "\/ros2_ws\/install\/setup.bash"/a \
+            ros2 run healthcheck_pkg healthcheck_node &' \
+            $entrypoint_file
+
+COPY ./healthcheck.sh /
+HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
+    CMD ["/healthcheck.sh"]

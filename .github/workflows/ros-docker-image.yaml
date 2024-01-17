@@ -1,28 +1,32 @@
-name: Build/Publish ROS Docker Image 
+---
+name: Build/Publish ROS Docker Image
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       build_type:
-        description: "Is it a \"development\" or a \"stable\" release?"
+        description: Is it a "development" or a "stable" release?
         required: true
-        default: 'development'
+        default: development
         type: choice
         options:
           - development
           - stable
       target_distro:
-        description: "In case of \"stable\" release specify the ROS distro of the existing docker image (eg. humble)"
+        description: In case of "stable" release specify the ROS distro of the existing docker image (eg.
+          humble)
         type: string
-        default: "ardent"
+        default: ardent
       target_release:
-        description: "In case of \"stable\" release specify the version of the existing docker image (eg. 1.0.12)"
+        description: In case of "stable" release specify the version of the existing docker image (eg.
+          1.0.12)
         type: string
-        default: "0.0.0"
+        default: 0.0.0
       target_date:
-        description: "In case of \"stable\" release specify the date of the existing docker image in format YYYYMMDD (eg. 20220124)"
+        description: In case of "stable" release specify the date of the existing docker image in format
+          YYYYMMDD (eg. 20220124)
         type: string
-        default: "20131206"
+        default: '20131206'
   repository_dispatch:
     types: [rebuild, ros-package-update]
   pull_request:
@@ -39,12 +43,12 @@ jobs:
 
         include:
           - dockerfile: Dockerfile.hardware
-            platforms: "linux/amd64, linux/arm64"
-            ros_distro: "humble"
+            platforms: linux/amd64, linux/arm64
+            ros_distro: humble
           - dockerfile: Dockerfile.simulation
-            repo_name: "rosbot-xl-gazebo"
-            platforms: "linux/amd64"
-            ros_distro: "humble"
+            repo_name: rosbot-xl-gazebo
+            platforms: linux/amd64
+            ros_distro: humble
 
     steps:
 
@@ -55,7 +59,7 @@ jobs:
         uses: husarion-ci/ros-docker-img-action@v0.4
         with:
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-          dockerhub_token:  ${{ secrets.DOCKERHUB_TOKEN }}
+          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
           dockerfile: ${{ matrix.dockerfile }}
           repo_name: ${{ matrix.repo_name }}
           build_type: ${{ inputs.build_type }}
