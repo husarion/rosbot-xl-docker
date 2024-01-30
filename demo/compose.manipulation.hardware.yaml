@@ -10,9 +10,18 @@ services:
     <<: *net-config
     command: ros2 run micro_ros_agent micro_ros_agent  udp4 --port 8888
 
-  rosbot:
-    image: husarion/rosbot-xl-manipulation:humble
+  rosbot-xl:
+    image: husarion/rosbot-xl-manipulation:humble-1.1.0-20230621-stable
     <<: *net-config
+    devices:
+      - ${MANIPULATOR_SERIAL:?err}:/dev/manipulator
     volumes:
-    - ./lan-cyclonedds.xml:/lan-cyclonedds.xml
-    command: ros2 launch rosbot_xl_manipulation_bringup bringup.launch.py mecanum:=${MECANUM:-False}
+      - ./config/joy_servo.yaml:/joy_servo.yaml
+      - ./config/diff_drive_controller_manipulation.yaml:/ros2_ws/install/rosbot_xl_manipulation_controller/share/rosbot_xl_manipulation_controller/config/diff_drive_controller_manipulation.yaml
+    command: >
+      ros2 launch rosbot_xl_manipulation_bringup bringup.launch.py
+        mecanum:=False
+        manipulator_usb_port:=/dev/manipulator
+        manipulator_baud_rate:=${MANIPULATOR_BAUDRATE:-1000000}
+        joy_servo_params_file:=/joy_servo.yaml
+        antenna_rotation_angle:=${ANTENNA_ROTATION_ANGLE:- -1.57}
