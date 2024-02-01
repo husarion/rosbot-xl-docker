@@ -108,6 +108,8 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     rm -rf build log src && \
     rm -rf /var/lib/apt/lists/*
 
+RUN test -f "/ros2_ws/install/setup.bash" && echo "source /ros2_ws/install/setup.bash" >> /etc/bash.bashrc
+
 COPY --from=stm32flash_builder /stm32flash/stm32flash /usr/bin/
 COPY --from=stm32_firmware /firmware.bin /firmware.bin
 COPY --from=stm32_firmware /read_cpu_id/.pio/build/olimex_e407/firmware.bin /firmware_read_cpu_id.bin
@@ -125,3 +127,4 @@ RUN entrypoint_file=$(if [ -f "/ros_entrypoint.sh" ]; then echo "/ros_entrypoint
 COPY ./healthcheck.sh /
 HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
     CMD ["/healthcheck.sh"]
+
