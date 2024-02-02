@@ -79,10 +79,12 @@ COPY --from=ros_builder /version.txt /version.txt
 COPY --from=healthcheck_builder /ros2_ws /ros2_ws_healthcheck
 
 # for backward compatibility
-RUN cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py /usr/bin/ && \
+RUN chmod +x src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py && \
+    cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py /usr/bin/ && \
     cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py / && \
-    cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /root/firmware.bin
-
+    cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /root/firmware.bin && \
+    cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /firmware.bin
+    
 COPY ftdi-eeprom-conf.py /usr/bin/
 COPY print-serial-number.py /usr/bin/
 
