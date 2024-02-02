@@ -1,6 +1,7 @@
 #include "fstream"
 #include "nav_msgs/msg/odometry.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include <cstdlib>
 
 using namespace std::chrono_literals;
 
@@ -33,9 +34,16 @@ void healthy_check() {
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-  auto node = rclcpp::Node::make_shared("healthcheck_rosbot_xl");
+
+  std::string topic = "odometry/filtered";
+
+  if(const char* ns = std::getenv("ROBOT_NAMESPACE")) {
+    topic = std::string(ns) + "/" + topic;
+  }
+
+  auto node = rclcpp::Node::make_shared("healthcheck_rosbot");
   auto sub = node->create_subscription<nav_msgs::msg::Odometry>(
-      "odometry/filtered", rclcpp::SensorDataQoS().keep_last(1), msg_callback);
+      topic, rclcpp::SensorDataQoS().keep_last(1), msg_callback);
 
   while (rclcpp::ok()) {
     rclcpp::spin_some(node);
