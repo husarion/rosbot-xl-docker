@@ -85,9 +85,6 @@ RUN chmod +x src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py && \
     cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /root/firmware.bin && \
     cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /firmware.bin
     
-COPY ftdi-eeprom-conf.py /usr/bin/
-COPY print-serial-number.py /usr/bin/
-
 RUN apt-get update && apt-get install -y \
         python3-pip \
         python3-rosdep \
@@ -112,9 +109,9 @@ RUN apt-get update && apt-get install -y \
 COPY healthcheck.sh /
 COPY ./husarion_utils /husarion_utils
 
-# COPY run_healthcheck_node.sh /
-
-# COPY print-serial-number.py /usr/bin/
+COPY run_healthcheck_node.sh /
+COPY ftdi-eeprom-conf.py /usr/bin/
+COPY print-serial-number.py /usr/bin/
 
 ENV ROBOT_NAMESPACE=
 
@@ -122,4 +119,5 @@ HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
     CMD ["/healthcheck.sh"]
 
 RUN sed -i "/# <additional-user-commands>/r /run_healthcheck_node.sh" /*_entrypoint.sh && \
-    sed -i "/# <additional-user-commands>/d" /*_entrypoint.sh
+    sed -i "/# <additional-user-commands>/d" /*_entrypoint.sh && \
+    rm -rf /run_healthcheck_node.sh
