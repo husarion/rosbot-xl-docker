@@ -24,7 +24,7 @@ def launch_setup(context, *args, **kwargs):
     # Include 'combined.launch.py' with forwarded arguments
     combined_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare('rosbot_xl_bringup'), 'launch/combined.launch.py'
+            FindPackageShare('rosbot_xl_bringup'), '/launch/combined.launch.py'
         ]),
         launch_arguments={arg: LaunchConfiguration(arg) for arg in context.launch_configurations}.items()
     )
