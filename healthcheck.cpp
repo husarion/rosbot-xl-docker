@@ -1,55 +1,63 @@
 #include "fstream"
 #include "nav_msgs/msg/odometry.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include <cstdlib>
 
 using namespace std::chrono_literals;
 
-#define LOOP_PERIOD 500ms
+#define HEALTHCHECK_PERIOD 500ms
 #define MSG_VALID_TIME 2s
 
-std::chrono::steady_clock::time_point last_msg_time;
+class HealthCheckNode : public rclcpp::Node {
+public:
+  HealthCheckNode()
+      : Node("healthcheck_rosbot"),
+        last_msg_time(std::chrono::steady_clock::now()) {
 
-void write_health_status(const std::string &status) {
-  std::ofstream healthFile("/var/tmp/health_status.txt");
-  healthFile << status;
-}
+    // Set custom QoS settings to match the publisher
+    auto qos = rclcpp::QoS(rclcpp::QoSInitialization(RMW_QOS_POLICY_HISTORY_KEEP_LAST, 10));
+    qos.reliability(RMW_QOS_POLICY_RELIABILITY_RELIABLE);
+    qos.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
 
-void msg_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-  last_msg_time = std::chrono::steady_clock::now();
-}
+    subscription_ = create_subscription<nav_msgs::msg::Odometry>(
+        "odometry/filtered", qos,
+        std::bind(&HealthCheckNode::msgCallback, this, std::placeholders::_1));
 
-void healthy_check() {
-  std::chrono::steady_clock::time_point current_time =
-      std::chrono::steady_clock::now();
-  std::chrono::duration<double> elapsed_time = current_time - last_msg_time;
-  bool is_msg_valid = elapsed_time < MSG_VALID_TIME;
-
-  if (is_msg_valid) {
-    write_health_status("healthy");
-  } else {
-    write_health_status("unhealthy");
+    timer_ = create_wall_timer(HEALTHCHECK_PERIOD,
+                               std::bind(&HealthCheckNode::healthyCheck, this));
   }
-}
+
+private:
+  std::chrono::steady_clock::time_point last_msg_time;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
+  rclcpp::TimerBase::SharedPtr timer_;
+
+  void writeHealthStatus(const std::string &status) {
+    std::ofstream healthFile("/var/tmp/health_status.txt");
+    healthFile << status;
+  }
+
+  void msgCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+    // RCLCPP_DEBUG(get_logger(), "Msg arrived");
+    last_msg_time = std::chrono::steady_clock::now();
+  }
+
+  void healthyCheck() {
+    auto current_time = std::chrono::steady_clock::now();
+    auto elapsed_time = current_time - last_msg_time;
+    bool is_msg_valid = elapsed_time < MSG_VALID_TIME;
+
+    if (is_msg_valid) {
+      writeHealthStatus("healthy");
+    } else {
+      writeHealthStatus("unhealthy");
+    }
+  }
+};
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-
-  std::string topic = "odometry/filtered";
-
-  if(const char* ns = std::getenv("ROBOT_NAMESPACE")) {
-    topic = std::string(ns) + "/" + topic;
-  }
-
-  auto node = rclcpp::Node::make_shared("healthcheck_rosbot");
-  auto sub = node->create_subscription<nav_msgs::msg::Odometry>(
-      topic, rclcpp::SensorDataQoS().keep_last(1), msg_callback);
-
-  while (rclcpp::ok()) {
-    rclcpp::spin_some(node);
-    healthy_check();
-    std::this_thread::sleep_for(LOOP_PERIOD);
-  }
-
+  auto node = std::make_shared<HealthCheckNode>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
   return 0;
 }
