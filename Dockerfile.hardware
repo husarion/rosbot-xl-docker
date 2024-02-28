@@ -56,13 +56,18 @@ RUN git clone --depth 1 -b master https://github.com/husarion/rosbot_xl_ros.git 
     rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
+    rosdep install --from-paths src --ignore-src -y --simulate > /rosdep_output.txt && \
     rosdep install --from-paths src --ignore-src -y && \
     MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     source /opt/$MYDISTRO/$ROS_DISTRO/setup.bash && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release  && \
-    echo $(cat /ros2_ws/src/rosbot_xl/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') >> /version.txt && \
-    rm -rf build log
-
+    echo $(cat /ros2_ws/src/rosbot_xl/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt && \
+    # for backward compatibility
+    chmod +x src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py && \
+    cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py / && \
+    cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /firmware.bin && \
+    # make the /ros2_ws smaller
+    rm -rf build log src
 
 ## =========================== Final Stage ===============================
 FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
@@ -76,34 +81,27 @@ WORKDIR /ros2_ws
 
 COPY --from=ros_builder /ros2_ws /ros2_ws
 COPY --from=ros_builder /version.txt /version.txt
-COPY --from=healthcheck_builder /ros2_ws /ros2_ws_healthcheck
+COPY --from=ros_builder /rosdep_output.txt /rosdep_output.txt
 
 # for backward compatibility
-RUN chmod +x src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py && \
-    cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py /usr/bin/ && \
-    cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py / && \
-    cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /root/firmware.bin && \
-    cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /firmware.bin
-    
+COPY --from=ros_builder /flash-firmware.py /flash-firmware.py
+COPY --from=ros_builder /flash-firmware.py /usr/bin/flash-firmware.py
+COPY --from=ros_builder /firmware.bin /firmware.bin
+COPY --from=ros_builder /firmware.bin /root/firmware.bin
+
+COPY --from=healthcheck_builder /ros2_ws /ros2_ws_healthcheck
+
 RUN apt-get update && apt-get install -y \
         python3-pip \
-        python3-rosdep \
         stm32flash \
         libusb-1.0 \
-        usbutils \
         screen \
+        ros-$ROS_DISTRO-robot-state-publisher \
         ros-$ROS_DISTRO-teleop-twist-keyboard && \
-    pip3 install pyftdi && \
-    rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
-    rosdep init && \
-    rosdep update --rosdistro $ROS_DISTRO && \
-    rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
-    # Size optimalization
+    bash -c "$(cat /rosdep_output.txt)" && \
     apt-get remove -y \
-        python3-rosdep \
         python3-pip && \
     apt-get clean && \
-    rm -rf src && \
     rm -rf /var/lib/apt/lists/*
 
 COPY healthcheck.sh /
