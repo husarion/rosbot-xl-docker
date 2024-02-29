@@ -93,7 +93,7 @@ RUN git clone --depth 1 -b master https://github.com/husarion/rosbot_xl_ros.git 
     rm -rf build log src
 
 ## =========================== Final Stage ===============================
-FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
+FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core AS final
 
 ARG ROS_DISTRO
 ARG PREFIX
@@ -141,3 +141,9 @@ HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
 RUN sed -i "/# <additional-user-commands>/r /run_healthcheck_node.sh" /*_entrypoint.sh && \
     sed -i "/# <additional-user-commands>/d" /*_entrypoint.sh && \
     rm -rf /run_healthcheck_node.sh
+
+
+## =========================== Optimize size ===============================
+FROM scratch
+
+COPY --from=final / /
