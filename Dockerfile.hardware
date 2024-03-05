@@ -102,17 +102,31 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /ros2_ws
 
-COPY --from=rosdep_output /version.txt /version.txt
-COPY --from=rosdep_output /flash-firmware.py /flash-firmware.py
-COPY --from=rosdep_output /flash-firmware.py /usr/bin/flash-firmware.py
-COPY --from=rosdep_output /firmware.bin /firmware.bin
-COPY --from=rosdep_output /firmware.bin /root/firmware.bin
-COPY --from=rosdep_output /rosdep_output.txt /rosdep_output.txt
+COPY --from=rosdep_output \
+    /version.txt \
+    /flash-firmware.py \
+    /firmware.bin \
+    /rosdep_output.txt \
+    /
 
-# for backward compatibility
-COPY --from=ros_builder /ros2_ws /ros2_ws
+COPY --from=ros_builder \
+    /ros2_ws \
+    /ros2_ws
 
-COPY --from=healthcheck_builder /ros2_ws /ros2_ws_healthcheck
+COPY --from=healthcheck_builder \
+    /ros2_ws \
+    /ros2_ws_healthcheck
+
+COPY healthcheck.sh \
+    run_healthcheck_node.sh \
+    /
+
+COPY ./husarion_utils \
+    /husarion_utils
+
+COPY ftdi-eeprom-conf.py \
+    print-serial-number.py \
+    /usr/bin/
 
 RUN apt-get update && apt-get install -y \
         python3-pip \
@@ -124,20 +138,16 @@ RUN apt-get update && apt-get install -y \
     apt-get remove -y \
         python3-pip && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY healthcheck.sh /
-COPY ./husarion_utils /husarion_utils
-
-COPY run_healthcheck_node.sh /
-COPY ftdi-eeprom-conf.py /usr/bin/
-COPY print-serial-number.py /usr/bin/
+    rm -rf /var/lib/apt/lists/* && \
+    # for backward compatibility
+    cp /flash-firmware.py /usr/bin/flash-firmware.py && \
+    cp /firmware.bin /root/firmware.bin && \
+    # running healthcheck
+    sed -i "/# <additional-user-commands>/r /run_healthcheck_node.sh" /*_entrypoint.sh && \
+    sed -i "/# <additional-user-commands>/d" /*_entrypoint.sh && \
+    rm -rf /run_healthcheck_node.sh
 
 ENV ROBOT_NAMESPACE=
 
 HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
     CMD ["/healthcheck.sh"]
-
-RUN sed -i "/# <additional-user-commands>/r /run_healthcheck_node.sh" /*_entrypoint.sh && \
-    sed -i "/# <additional-user-commands>/d" /*_entrypoint.sh && \
-    rm -rf /run_healthcheck_node.sh
