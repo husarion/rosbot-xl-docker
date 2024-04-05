@@ -5,13 +5,8 @@ FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
 
 ARG PREFIX
 
-# select bash as default shell
-SHELL ["/bin/bash", "-c"]
-
-ENV IGNITION_VERSION fortress
-ENV HUSARION_ROS_BUILD simulation
-
 WORKDIR /ros2_ws
+ENV HUSARION_ROS_BUILD_TYPE simulation
 
 COPY ./healthcheck.cpp /
 
@@ -27,9 +22,8 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     apt-get upgrade -y && \
     # build & install ROSbot XL packages
     source "/opt/$MYDISTRO/$ROS_DISTRO/setup.bash" && \
-    git clone https://github.com/husarion/rosbot_xl_ros.git /ros2_ws/src && \
-    vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
-    vcs import src < src/rosbot_xl/rosbot_xl_simulation.repos && \
+    git clone --depth 1 https://github.com/husarion/rosbot_xl_ros.git src && \
+    vcs import src < src/rosbot_xl/rosbot_xl_$HUSARION_ROS_BUILD_TYPE.repos && \
     # without this line (using vulcanexus base image) rosdep init throws error: "ERROR: default sources list file already exists:"
     rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
@@ -46,11 +40,10 @@ RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     mv /healthcheck.cpp /ros2_ws/src/healthcheck_pkg/src/ && \
     cd .. && \
     # Build
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
+    colcon build --symlink-install --packages-up-to rosbot_xl --cmake-args -DCMAKE_BUILD_TYPE=Release && \
     # Save version
     echo $(cat /ros2_ws/src/rosbot_xl_gazebo/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt && \
     # Size optimalization
-    rm -rf build log src && \
     export SUDO_FORCE_REMOVE=yes && \
     apt-get remove -y \
         python3-pip \
