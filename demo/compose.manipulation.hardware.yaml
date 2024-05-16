@@ -6,7 +6,7 @@ x-net-config:
 services:
 
   rosbot-xl:
-    image: husarion/rosbot-xl-manipulation:humble-update
+    image: husarion/rosbot-xl-manipulation:humble-1.1.2-20240515
     <<: *net-config
     devices:
       - ${MANIPULATOR_SERIAL:?err}:/dev/ttyMANIPULATOR
