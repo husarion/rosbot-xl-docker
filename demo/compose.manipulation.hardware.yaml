@@ -12,10 +12,7 @@ services:
       - ${MANIPULATOR_SERIAL:?err}:/dev/ttyMANIPULATOR
     volumes:
       - ./config/joy_servo.yaml:/joy_servo.yaml
-      - ./config/diff_drive_controller_manipulation.yaml:/ros2_ws/install/rosbot_xl_manipulation_controller/share/rosbot_xl_manipulation_controller/config/diff_drive_controller_manipulation.yaml
     command: >
       ros2 launch rosbot_xl_manipulation_bringup bringup.launch.py
         mecanum:=${MECANUM:?False}
-        manipulator_usb_port:=/dev/ttyMANIPULATOR
-        manipulator_baud_rate:=${MANIPULATOR_BAUDRATE:-1000000}
         joy_servo_params_file:=/joy_servo.yaml

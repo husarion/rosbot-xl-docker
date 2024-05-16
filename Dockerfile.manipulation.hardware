@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     rm -rf /ros2_ws/* && \
     # build & install ROSbot XL packages
     source "/opt/ros/$ROS_DISTRO/setup.bash" && \
-    git clone -b update https://github.com/husarion/rosbot_xl_manipulation_ros.git src/rosbot_xl_manipulation_ros && \
+    git clone https://github.com/husarion/rosbot_xl_manipulation_ros.git src/rosbot_xl_manipulation_ros && \
     vcs import src < src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/rosbot_xl_manipulation.repos && \
     vcs import src < src/rosbot_xl_ros/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/open_manipulator_x/open_manipulator_x.repos && \
