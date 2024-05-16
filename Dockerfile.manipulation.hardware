@@ -8,29 +8,27 @@ COPY ./healthcheck_manipulation.cpp /
 
 # install everything needed
 RUN apt-get update && apt-get install -y \
-        python3-colcon-common-extensions \
-        python3-rosdep \
-        python3-vcstool \
-        git && \
-    apt-get upgrade -y && \
+        python3-pip \
+        ros-dev-tools && \
     rm -rf /ros2_ws/* && \
     # build & install ROSbot XL packages
     source "/opt/ros/$ROS_DISTRO/setup.bash" && \
-    git clone https://github.com/husarion/rosbot_xl_manipulation_ros.git /ros2_ws/src/rosbot_xl_manipulation_ros && \
+    git clone https://github.com/husarion/rosbot_xl_manipulation_ros.git src/rosbot_xl_manipulation_ros && \
     vcs import src < src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/rosbot_xl_manipulation.repos && \
     vcs import src < src/rosbot_xl_ros/rosbot_xl/rosbot_xl_hardware.repos && \
     vcs import src < src/open_manipulator_x/open_manipulator_x.repos && \
     # it is necessary to remove simulation - otherwise rosdep tries to install dependencies
     rm -r src/rosbot_xl_ros/rosbot_xl_gazebo && \
     rm -r src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation_gazebo && \
+    cp -r src/ros2_controllers/diff_drive_controller src && \
+    cp -r src/ros2_controllers/imu_sensor_broadcaster src && \
+    rm -rf src/ros2_controllers && \
     rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
     # Create healthcheck package
     cd src/ && \
-    # Does not build
-    rm -rf DynamixelSDK/dynamixel_sdk_examples && \
     ros2 pkg create healthcheck_pkg --build-type ament_cmake --dependencies rclcpp control_msgs nav_msgs && \
     sed -i '/find_package(nav_msgs REQUIRED)/a \
             add_executable(healthcheck_node src/healthcheck_manipulation.cpp)\n \
@@ -40,17 +38,14 @@ RUN apt-get update && apt-get install -y \
     mv /healthcheck_manipulation.cpp /ros2_ws/src/healthcheck_pkg/src/ && \
     cd .. && \
     # Build
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release && \
     # Save version
     echo $(cat /ros2_ws/src/rosbot_xl_manipulation_ros/rosbot_xl_manipulation/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') > /version.txt && \
     # Size optimalization
-    rm -rf build log src && \
     export SUDO_FORCE_REMOVE=yes && \
     apt-get remove -y \
-        python3-colcon-common-extensions \
-        python3-rosdep \
-        python3-vcstool \
-        git && \
+        python3-pip \
+        ros-dev-tools && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -64,3 +59,5 @@ RUN entrypoint_file=$(if [ -f "/ros_entrypoint.sh" ]; then echo "/ros_entrypoint
 COPY ./healthcheck.sh /
 HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
     CMD ["/healthcheck.sh"]
+
+STOPSIGNAL SIGINT
