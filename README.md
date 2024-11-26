@@ -2,14 +2,18 @@
 
 Docker images for ROSbot XL
 
-[![Build a Docker Image](https://github.com/husarion/rosbot-xl-docker/actions/workflows/build_push.yaml/badge.svg)](https://github.com/husarion/rosbot-xl-docker/actions/workflows/build_push.yaml)
+[![Build a Docker Image](https://github.com/husarion/rosbot-xl-docker/actions/workflows/ros-docker-image.yaml/badge.svg)](https://github.com/husarion/rosbot-xl-docker/actions/workflows/ros-docker-image.yaml)
 
 Official ROSbot XL docker images built from this repo are available here: https://hub.docker.com/r/husarion/rosbot-xl/tags
 
 - `husarion/rosbot-xl:humble` - the image for a real (physical) robot
 - `husarion/rosbot-xl-gazebo:humble` - the image with Gazebo simulation model
 
-## Flashing the firmware
+## Demo
+
+### Hardware
+
+1. Flashing the firmware
 
 Connect ROSbot to a Single Board Computer inside ROSbot XL by using a micro-USB cable. Check under which port the board is listed on your OS (in most cases it's `/dev/ttyUSB0`):
 
@@ -25,6 +29,24 @@ flash-firmware.py -p /dev/ttyUSB0
 ```
 
 Set dip switch no. 3 to **"off" state**  (`BOOT0` pin to LOW) and click the `RESET` button to start a newly flashed firmware.
+
+2. Run docker
+
+```bash
+git clone https://github.com/husarion/rosbot-xl-docker
+cd rosbot-xl-docker/demo
+docker compose -f compose.hardware.yaml up
+```
+
+### Simulation
+
+Run docker
+
+```bash
+git clone https://github.com/husarion/rosbot-xl-docker
+cd rosbot-xl-docker/demo
+docker compose -f compose.simulation.yaml up
+```
 
 ## Building locally
 
