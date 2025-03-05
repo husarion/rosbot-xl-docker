@@ -5,17 +5,21 @@ x-gpu-config:
     - DISPLAY=${DISPLAY:?err}
     - NVIDIA_VISIBLE_DEVICES=all
     - NVIDIA_DRIVER_CAPABILITIES=all
+    - USER
 
 x-cpu-config:
   &cpu-config
   environment:
     - DISPLAY=${DISPLAY:?err}
     - LIBGL_ALWAYS_SOFTWARE=1
+    - USER
 
 services:
   rosbot_xl:
     image: husarion/rosbot-xl-gazebo:humble
     <<: [*gpu-config]
+    network_mode: host
+    ipc: host
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     command: >
