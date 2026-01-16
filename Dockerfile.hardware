@@ -8,8 +8,6 @@ FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-base AS healthcheck_builder
 ARG ROS_DISTRO
 ARG PREFIX
 
-SHELL ["/bin/bash", "-c"]
-
 WORKDIR /ros2_ws
 
 RUN mkdir src && \
@@ -28,8 +26,7 @@ COPY healthcheck.cpp src/healthcheck_pkg/src/
 
 RUN MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     source /opt/$MYDISTRO/$ROS_DISTRO/setup.bash && \
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release && \
-    rm -rf build log src
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 ## =========================== ROS builder ===============================
 FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-base AS ros_builder
@@ -37,21 +34,17 @@ FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-base AS ros_builder
 ARG ROS_DISTRO
 ARG PREFIX
 
-SHELL ["/bin/bash", "-c"]
-
 WORKDIR /ros2_ws
-RUN mkdir src
+ENV HUSARION_ROS_BUILD_TYPE=hardware
 
 RUN apt-get update && apt-get install -y \
         python3-pip
 
-RUN git clone --depth 1 -b master https://github.com/husarion/rosbot_xl_ros.git src && \
-    vcs import src < src/rosbot_xl/rosbot_xl_hardware.repos && \
+RUN git clone --depth 1 https://github.com/husarion/rosbot_xl_ros.git src && \
+    vcs import src < src/rosbot_xl/rosbot_xl_$HUSARION_ROS_BUILD_TYPE.repos && \
     cp -r src/ros2_controllers/diff_drive_controller src/ && \
     cp -r src/ros2_controllers/imu_sensor_broadcaster src/ && \
     rm -rf src/ros2_controllers && \
-    # it is necessary to remove simulation - otherwise rosdep tries to install dependencies
-    rm -r src/rosbot_xl_gazebo && \
     # without this line (using vulcanexus base image) rosdep init throws error: "ERROR: default sources list file already exists:"
     rm -rf /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
@@ -59,10 +52,8 @@ RUN git clone --depth 1 -b master https://github.com/husarion/rosbot_xl_ros.git 
     rosdep install --from-paths src --ignore-src -y && \
     MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
     source /opt/$MYDISTRO/$ROS_DISTRO/setup.bash && \
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release  && \
-    echo $(cat /ros2_ws/src/rosbot_xl/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') >> /version.txt && \
-    rm -rf build log
-
+    colcon build --symlink-install --packages-up-to rosbot_xl --cmake-args -DCMAKE_BUILD_TYPE=Release && \
+    echo $(cat /ros2_ws/src/rosbot_xl/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') >> /version.txt
 
 ## =========================== Final Stage ===============================
 FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
@@ -70,9 +61,8 @@ FROM husarnet/ros:${PREFIX}${ROS_DISTRO}-ros-core
 ARG ROS_DISTRO
 ARG PREFIX
 
-SHELL ["/bin/bash", "-c"]
-
 WORKDIR /ros2_ws
+ENV HUSARION_ROS_BUILD_TYPE=hardware
 
 COPY --from=ros_builder /ros2_ws /ros2_ws
 COPY --from=ros_builder /version.txt /version.txt
@@ -84,7 +74,7 @@ RUN chmod +x src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py && \
     cp src/rosbot_xl_utils/rosbot_xl_utils/flash-firmware.py / && \
     cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /root/firmware.bin && \
     cp install/rosbot_xl_utils/share/rosbot_xl_utils/firmware/firmware-*.bin /firmware.bin
-    
+
 RUN apt-get update && apt-get install -y \
         python3-pip \
         python3-rosdep \
@@ -103,7 +93,6 @@ RUN apt-get update && apt-get install -y \
         python3-rosdep \
         python3-pip && \
     apt-get clean && \
-    rm -rf src && \
     rm -rf /var/lib/apt/lists/*
 
 COPY healthcheck.sh /
@@ -112,8 +101,6 @@ COPY ./husarion_utils /husarion_utils
 COPY run_healthcheck_node.sh /
 COPY ftdi-eeprom-conf.py /usr/bin/
 COPY print-serial-number.py /usr/bin/
-
-ENV ROBOT_NAMESPACE=
 
 HEALTHCHECK --interval=2s --timeout=1s --start-period=30s --retries=1 \
     CMD ["/healthcheck.sh"]
